@@ -1,0 +1,6 @@
+{
+  "name": "Time-Tracking",
+  "short_name": "Time-Tracking",
+  "start_url": "/",
+  "display": "standalone"
+}

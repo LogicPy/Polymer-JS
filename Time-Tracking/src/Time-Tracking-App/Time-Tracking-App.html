@@ -1,0 +1,232 @@
+
+<!-- Time Tracker / Polymer Project-->
+<!-- Wayne Kenney / 2018 -->
+
+<!-- Polymer Components -->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<!-- Vaadin Grid -->
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+
+<!-- Paper Style Components -->
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet">
+
+<!-- Database Components -->
+<script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
+<script src="../../bower_components/pouchdb-upsert/dist/pouchdb.upsert.js"></script>
+
+<dom-module id="Time-Tracking-App">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: 'Roboto', 'Noto', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      vaadin-grid {
+        margin: 10px;
+        height: 300px;
+        border: 1px solid #dddddd;
+      }
+
+      paper-input {
+        width: 300px;
+      }
+      #time
+      {
+        font-weight: 200%;
+        color: black;
+      }
+      .form
+      {
+        width: 95% !important;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
+      h2
+      {
+        font-family: 'Lobster', cursive;
+        font-size: 40px;
+      }
+
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        color: black;
+        text-align: center;
+        border-top-color: black;
+        border-top-width: 1px;
+        border-top-style: solid;
+        font-family: 'K2D', sans-serif;
+    }
+
+    </style>
+
+    <!-- Web Form -->
+    <div class="form">
+
+    <h2>Time Tracker</h2>
+
+      <vaadin-grid id="grid" on-selected-items-changed="handleSelect">
+        <table>
+          <colgroup>
+            <col name="start">
+            <col name="end">
+            <col name="range">
+          </colgroup>
+        </table>
+      </vaadin-grid>
+
+      <div class="formObjects">
+      <paper-input type="time" id="start" label="Start" onchange="calcRange()" value="{{userRecord.start}}"></paper-input>
+      <paper-input type="time" id="end" label="End" onchange="calcRange()" value="{{userRecord.end}}"></paper-input>
+      <paper-input id="rangeVal" label="Range" value="{{userRecord.range}}"></paper-input>
+      <paper-button raised on-tap="handleSave" id="saveButton">Save</paper-button>
+      <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
+      <paper-button raised on-tap="rangeCalc" id="rangeBtn">Range</paper-button>
+      </div>
+
+  </div>
+
+  <div class="footer">
+    <p>Time Tracker / 2018</p>
+  </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'Time-Tracking-App',
+
+      properties: {
+        _db: Object,
+
+        // Values
+        userRecord: {
+          type: Object,
+          value: function() {
+            return {};
+          },
+        },
+      },
+
+      // Function: Database Definition
+      created: function() {
+        _db = new PouchDB('times');
+      },
+
+      // Function: On_Load
+      ready: function() {
+        var grid = this.$.grid;
+
+        grid.items = function(params, callback) {
+          _db.allDocs({
+            include_docs: true,
+            skip: params.index,
+            limit: params.count,
+          }).then(function(response) {
+            var rows = response.rows.map(function(row) {
+              return row.doc;
+            });
+            callback(rows, response.total_rows)
+          }).catch(function(err) {
+            console.log(err);
+          });
+        };
+      },
+
+      // Function: Selection
+      handleSelect: function(e) {
+        var grid = this.$.grid;
+
+        // Clear
+        if (grid.selection.size === 0) {
+          this.set('userRecord', {});
+          this.$.deleteButton.disabled = true;
+          return;
+        }
+
+        var index = grid.selection.selected()[0];
+
+        grid.getItem(index, function(err, item) {
+          this.set('userRecord', Object.assign({}, item));
+          this.$.deleteButton.disabled = false;
+        }.bind(this));
+      },
+
+      // Function: Save
+      handleSave: function() {
+          calcRange();
+          var grid = this.$.grid;
+          var newDoc = Object.assign({}, this.userRecord);
+
+          if (!newDoc.hasOwnProperty('_id')) {
+            newDoc._id = new Date().toISOString();
+          }
+
+          _db.upsert(newDoc._id, function(doc) {
+
+            newDoc._rev = doc._rev;
+            return newDoc;
+          }).then(function(doc) {
+            grid.refreshItems();
+            grid.selection.clear();
+          }).catch(function(err) {
+            console.log(err)
+          });
+      
+      },
+
+      // Function: Delete
+      handleDelete: function() {
+        var grid = this.$.grid;
+
+        _db.remove(this.userRecord._id, this.userRecord._rev).then(function(doc) {
+          grid.selection.clear();
+        }).then(function(doc) {
+          grid.refreshItems();
+        }).catch(function(err) {
+          console.log(err);
+        });
+      },
+
+  });
+
+    // Function: Difference
+    function calcRange(){
+        var smon = document.getElementById('start').value ;
+        var fmon = document.getElementById('end').value ;
+        var diff = 0 ;
+        if (smon && fmon) {
+          smon = ConvertToSeconds(smon);
+          fmon = ConvertToSeconds(fmon);
+          diff = Math.abs( fmon - smon );
+          document.getElementById("rangeVal").value = secondsTohhmmss(diff);
+        }
+
+        function ConvertToSeconds(time) {
+          var splitTime = time.split(":");
+          return splitTime[0] * 3600 + splitTime[1] * 60;
+        }
+
+        function secondsTohhmmss(secs) {
+          var hours = parseInt(secs / 3600);
+          var seconds = parseInt(secs % 3600);
+          var minutes = parseInt(seconds / 60) ;
+          return hours + "hours : " + minutes + "minutes ";
+        } 
+    }
+
+  </script>
+</dom-module>
