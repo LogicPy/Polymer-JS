@@ -68,6 +68,7 @@
   "resolutions": {
     "webcomponentsjs": "^1.0.0",
     "mocha": "^2.3.0",
-    "test-fixture": "^1.0.0"
+    "test-fixture": "^1.0.0",
+    "iron-ajax": "1 - 2"
   }
 }

@@ -22,6 +22,11 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-filter.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
+
+<!-- Iron Ajax -->
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
@@ -29,6 +34,7 @@
 
 <!-- Database Components -->
 <script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
+<script src="../../bower_components/pouchdb-upsert/dist/pouchdb.upsert.js"></script>
 
 <dom-module id="time-track-2-app">
   <template>
@@ -58,41 +64,49 @@
     <h2>Time Tracker</h2>
 
 <!-- Grid Space -->
-    <iron-ajax auto url="" handle-as="json" last-response="{{times}}"></iron-ajax>
 
-    <vaadin-grid id="grid" theme="row-dividers" items="[[times.result]]" on-selected-items-changed="handleSelect">
+<!-- ajax Grid Testing -->
+<!--<iron-ajax
+    url="https://api.github.com/users/vaadin/repos"
+    params='{"type":"all"}'
+    handle-as="json"
+    last-response="{{timeData}}"
+    auto>
+</iron-ajax>-->
 
-      <vaadin-grid-column>
-        <template class="header">
-          <vaadin-grid-sorter path="Start">Start</vaadin-grid-sorter>
-        </template>
-        <template>[[item.start]]</template>
-      </vaadin-grid-column>
+<!--
+<vaadin-grid items="[[timeData]]" id="grid" on-selected-items-changed="handleSelect">
+    <vaadin-grid-column>      
+      <template class="header">Start</template>      
+      <template>[[item.full_name]]</template>
+    </vaadin-grid-column>
+    <vaadin-grid-column>
+      <template class="header">End</template>
+      <template>[[item.html_url]]</template>    
+    </vaadin-grid-column>    
+    <vaadin-grid-column>      
+      <template class="header">Range</template>      
+      <template>[[item.description]]</template>    
+    </vaadin-grid-column> 
+</vaadin-grid>-->
 
-      <vaadin-grid-column>
-        <template class="header">
-          <vaadin-grid-sorter path="end">End</vaadin-grid-sorter>
-        </template>
-        <template>[[item.end]]</template>
-      </vaadin-grid-column>
-
-      <vaadin-grid-column flex-grow="2">
-        <template class="header">
-          <vaadin-grid-sorter path="address.street">Range</vaadin-grid-sorter>
-        </template>
-        <template>[[item.range]]</template>
-      </vaadin-grid-column>
-
-    </vaadin-grid>
-
+<vaadin-grid id="grid" on-selected-items-changed="handleSelect">
+  <table>
+    <colgroup>
+      <col name="start">
+      <col name="end">
+      <col name="range">
+    </colgroup>
+  </table>
+</vaadin-grid>
 
 <div class="formObjects">
 <paper-input type="text" id="nameTracker" value="" label="Tracker Name"></paper-input>
 <paper-button raised on-tap="createTracker" id="saveButton">Create Tracker</paper-button>
 <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
 <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
-<paper-input type="time" id="starttxt" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
-<paper-input type="time" id="endtxt" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
+<paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
+<paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
 <paper-input id="rangeVal" label="Range" value="{{timeRecord.range}}">Range</paper-input>
 </div>
 
@@ -102,12 +116,9 @@
   <script>
 
     Polymer({
-
       is: 'time-track-2-app',
-
       properties: {
         _db: Object,
-
         // Values
         timeRecord: {
           type: Object,
@@ -129,7 +140,6 @@
       // Function: On_Load
       ready: function() {
         var grid = this.$.grid;
-
         grid.items = function(params, callback) {
           _db.allDocs({
             include_docs: true,
@@ -153,63 +163,45 @@
         }
         else
         {
-          // Already occupied
+          // Textbox already occupied
         }
-        this.$.starttxt.value = (new Date).toTimeString().slice(0,8);
-        this.$.endtxt.value = (new Date).toTimeString().slice(0,8);
+        this.$.start.value = (new Date).toTimeString().slice(0,8);
+        this.$.end.value = (new Date).toTimeString().slice(0,8);
       },
 
       // Function: Selection
       handleSelect: function(e) {
         var grid = this.$.grid;
 
-        // Clear
-        if (grid.selection.size === 0) {
-          this.set('timeRecord', {});
-          this.$.deleteButton.disabled = true;
-          return;
-        }
-
-        var index = grid.selection.selected()[0];
-
-        grid.getItem(index, function(err, item) {
-          this.set('timeRecord', Object.assign({}, item));
-          this.$.deleteButton.disabled = false;
-        }.bind(this));
       },
 
       // Function: Save
       handleSave: function() {
-          this.$.endtxt.value = (new Date).toTimeString().slice(0,8);
-
-          //var grid = this.$.grid;
-          //var newDoc = Object.assign({}, this.timeRecord);
-
-          //if (!newDoc.hasOwnProperty('_id')) {
-          //  newDoc._id = new Date().toISOString();
-          //}
-
-          //_db.upsert(newDoc._id, function(doc) {
-
-          //  newDoc._rev = doc._rev;
-          //  return newDoc;
-          //}).then(function(doc) {
-          //  grid.refreshItems();
-          //  grid.selection.clear();
-          //}).catch(function(err) {
-          //  console.log(err)
-          //});
+          this.$.end.value = (new Date).toTimeString().slice(0,8);
+          var grid = this.$.grid;
+          var newDoc = Object.assign({}, this.timeRecord);
+          if (!newDoc.hasOwnProperty('_id')) {
+            newDoc._id = new Date().toISOString();
+          }
+          _db.upsert(newDoc._id, function(doc) {
+            newDoc._rev = doc._rev;
+            return newDoc;
+          }).then(function(doc) {
+            grid.refreshItems();
+            grid.selection.clear();
+          }).catch(function(err) {
+            console.log(err)
+          });
       
           this.$.nameTracker.value = "";
-          this.$.starttxt.value = "";
-          this.$.endtxt.value = "";
+          this.$.start.value = "";
+          this.$.end.value = "";
           this.$.rangeVal.value = "";
       },
 
       // Function: Delete
       handleDelete: function() {
         var grid = this.$.grid;
-
         _db.remove(this.timeRecord._id, this.timeRecord._rev).then(function(doc) {
           grid.selection.clear();
         }).then(function(doc) {
@@ -221,8 +213,8 @@
 
     // Function: Calculate Range (Temporary)
     calcRange: function() {
-      var smon = this.$.starttxt.value;
-      var fmon = this.$.endtxt.value;
+      var smon = this.$.start.value;
+      var fmon = this.$.end.value;
         var diff = 0 ;
         if (smon && fmon) {
           smon = ConvertToSeconds(smon);
@@ -230,12 +222,10 @@
           diff = Math.abs( fmon - smon );
           this.$.rangeVal.value = secondsTohhmmss(diff);
         }
-
         function ConvertToSeconds(time) {
           var splitTime = time.split(":");
           return splitTime[0] * 3600 + splitTime[1] * 60;
         }
-
         function secondsTohhmmss(secs) {
           var hours = parseInt(secs / 3600);
           var seconds = parseInt(secs % 3600);
@@ -243,8 +233,8 @@
           return hours + "hours : " + minutes + "minutes ";
         } 
     }
-
   });
+
 
   </script>
 </dom-module>
