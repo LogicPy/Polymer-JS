@@ -87,12 +87,11 @@
 
 
 <div class="formObjects">
-<paper-input type="time" id="starttxt" label="Start" onchange="calcRange()" value="{{userRecord.start}}"></paper-input>
-<paper-input type="time" id="endtxt" label="End" onchange="calcRange()" value="{{userRecord.end}}"></paper-input>
-<paper-input id="rangeVal" label="Range" value="{{userRecord.range}}">Range</paper-input>
+<paper-input type="time" id="starttxt" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
+<paper-input type="time" id="endtxt" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
+<paper-input id="rangeVal" label="Range" value="{{timeRecord.range}}">Range</paper-input>
 <paper-button raised on-tap="handleSave" id="saveButton">Save</paper-button>
 <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
-<paper-button raised on-tap="calcRange" id="">Range</paper-button>
 </div>
 
 
@@ -108,7 +107,7 @@
         _db: Object,
 
         // Values
-        userRecord: {
+        timeRecord: {
           type: Object,
           value: function() {
             return {};
@@ -147,7 +146,7 @@
 
         // Clear
         if (grid.selection.size === 0) {
-          this.set('userRecord', {});
+          this.set('timeRecord', {});
           this.$.deleteButton.disabled = true;
           return;
         }
@@ -155,16 +154,15 @@
         var index = grid.selection.selected()[0];
 
         grid.getItem(index, function(err, item) {
-          this.set('userRecord', Object.assign({}, item));
+          this.set('timeRecord', Object.assign({}, item));
           this.$.deleteButton.disabled = false;
         }.bind(this));
       },
 
       // Function: Save
       handleSave: function() {
-          calcRange();
           var grid = this.$.grid;
-          var newDoc = Object.assign({}, this.userRecord);
+          var newDoc = Object.assign({}, this.timeRecord);
 
           if (!newDoc.hasOwnProperty('_id')) {
             newDoc._id = new Date().toISOString();
@@ -187,7 +185,7 @@
       handleDelete: function() {
         var grid = this.$.grid;
 
-        _db.remove(this.userRecord._id, this.userRecord._rev).then(function(doc) {
+        _db.remove(this.timeRecord._id, this.timeRecord._rev).then(function(doc) {
           grid.selection.clear();
         }).then(function(doc) {
           grid.refreshItems();
