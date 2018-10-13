@@ -1,0 +1,86 @@
+
+<!-- Time Tracker v2 / Polymer Project-->
+<!-- Wayne Kenney / 2018 -->
+
+<!-- Misc Components -->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/datetime-picker/datetime-picker.html">
+<link rel="import" href="../../bower_components/time-diff/time-diff.html">
+
+<!-- Vaadin Grid -->
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+
+
+<dom-module id="time-track-2-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+<!-- Grid Space -->
+    <iron-ajax auto url="" handle-as="json" last-response="{{times}}"></iron-ajax>
+
+    <vaadin-grid theme="row-dividers" items="[[times.result]]" column-reordering-allowed multi-sort>
+
+      <vaadin-grid-selection-column auto-select frozen> </vaadin-grid-selection-column>
+
+      <vaadin-grid-column>
+        <template class="header">
+          <vaadin-grid-sorter path="Start">Start</vaadin-grid-sorter>
+        </template>
+        <template>[[item.start]]</template>
+      </vaadin-grid-column>
+
+      <vaadin-grid-column>
+        <template class="header">
+          <vaadin-grid-sorter path="end">End</vaadin-grid-sorter>
+        </template>
+        <template>[[item.end]]</template>
+      </vaadin-grid-column>
+
+      <vaadin-grid-column flex-grow="2">
+        <template class="header">
+          <vaadin-grid-sorter path="address.street">Range</vaadin-grid-sorter>
+        </template>
+        <template>[[item.range]]</template>
+      </vaadin-grid-column>
+
+    </vaadin-grid>
+
+<!-- Date and Time picker Component -->
+<p>
+  <datetime-picker class="begin" auto-confirm datetime="{{min}}" max="{{max}}"></datetime-picker>
+  <datetime-picker class="end" auto-confirm datetime="{{max}}" min="{{min}}"></datetime-picker>
+</p>
+<p>
+  <div><code>Start: </code>: [[min]]</div>
+  <div><code>End: </code>: [[max]]</div>
+</p>
+
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class TimeTrack2App extends Polymer.Element {
+      static get is() { return 'time-track-2-app'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'time-track-2-app'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(TimeTrack2App.is, TimeTrack2App);
+  </script>
+</dom-module>
