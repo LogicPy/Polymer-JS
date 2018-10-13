@@ -2,6 +2,8 @@
 <!-- Time Tracker v2 / Polymer Project-->
 <!-- Wayne Kenney / 2018 -->
 
+<!-- Update: Using automatic node finding instead of document -->
+
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
@@ -11,8 +13,15 @@
 <link rel="import" href="../../bower_components/datetime-picker/datetime-picker.html">
 <link rel="import" href="../../bower_components/time-diff/time-diff.html">
 
+<!-- Paper Style Components -->
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
 <!-- Vaadin Grid -->
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-filter.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
 
 <!-- Database Components -->
 <script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
@@ -53,16 +62,13 @@
 
     </vaadin-grid>
 
-<!-- Date and Time picker Component -->
-<p>
-  <datetime-picker class="begin" auto-confirm datetime="{{min}}" max="{{max}}"></datetime-picker>
-  <datetime-picker class="end" auto-confirm datetime="{{max}}" min="{{min}}"></datetime-picker>
-</p>
-<p>
-  <div><code>Start: </code>: [[min]]</div>
-  <div><code>End: </code>: [[max]]</div>
-</p>
+<input type="time" id="starttxt" name="">
+<input type="time" id="endtxt" name="">
+<input type="text" id="rangeVal" name="">
 
+<paper-button raised on-tap="handleSave" id="saveButton">Save</paper-button>
+<paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
+<paper-button raised on-tap="calcRange" id="">Range</paper-button>
 
   </template>
 
@@ -76,7 +82,7 @@
         _db: Object,
 
         // Values
-        times: {
+        userRecord: {
           type: Object,
           value: function() {
             return {};
@@ -84,20 +90,19 @@
         },
       },
 
+    ready: function() {
 
+    },
 
-  });
-
-    // Function: Difference
-    function calcRange(){
-        var smon = document.getElementById('start').value ;
-        var fmon = document.getElementById('end').value ;
+    calcRange: function() {
+      var smon = this.$.starttxt.value;
+      var fmon = this.$.endtxt.value;
         var diff = 0 ;
         if (smon && fmon) {
           smon = ConvertToSeconds(smon);
           fmon = ConvertToSeconds(fmon);
           diff = Math.abs( fmon - smon );
-          document.getElementById("rangeVal").value = secondsTohhmmss(diff);
+          this.$.rangeVal.value = secondsTohhmmss(diff);
         }
 
         function ConvertToSeconds(time) {
@@ -112,6 +117,9 @@
           return hours + "hours : " + minutes + "minutes ";
         } 
     }
+
+  });
+
 
   </script>
 </dom-module>
