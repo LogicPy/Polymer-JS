@@ -2,8 +2,10 @@
 <!-- Time Tracker v2 / Polymer Project-->
 <!-- Wayne Kenney / 2018 -->
 
-<!-- Misc Components -->
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<!-- Misc Components -->
 <link rel="import" href="../../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
 <link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../../bower_components/datetime-picker/datetime-picker.html">
@@ -12,6 +14,8 @@
 <!-- Vaadin Grid -->
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 
+<!-- Database Components -->
+<script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
 
 <dom-module id="time-track-2-app">
   <template>
@@ -24,9 +28,7 @@
 <!-- Grid Space -->
     <iron-ajax auto url="" handle-as="json" last-response="{{times}}"></iron-ajax>
 
-    <vaadin-grid theme="row-dividers" items="[[times.result]]" column-reordering-allowed multi-sort>
-
-      <vaadin-grid-selection-column auto-select frozen> </vaadin-grid-selection-column>
+    <vaadin-grid id="grid" theme="row-dividers" items="[[times.result]]" on-selected-items-changed="handleSelect">
 
       <vaadin-grid-column>
         <template class="header">
@@ -65,22 +67,51 @@
   </template>
 
   <script>
-    /**
-     * @customElement
-     * @polymer
-     */
-    class TimeTrack2App extends Polymer.Element {
-      static get is() { return 'time-track-2-app'; }
-      static get properties() {
-        return {
-          prop1: {
-            type: String,
-            value: 'time-track-2-app'
-          }
-        };
-      }
+
+    Polymer({
+
+      is: 'time-track-2-app',
+
+      properties: {
+        _db: Object,
+
+        // Values
+        times: {
+          type: Object,
+          value: function() {
+            return {};
+          },
+        },
+      },
+
+
+
+  });
+
+    // Function: Difference
+    function calcRange(){
+        var smon = document.getElementById('start').value ;
+        var fmon = document.getElementById('end').value ;
+        var diff = 0 ;
+        if (smon && fmon) {
+          smon = ConvertToSeconds(smon);
+          fmon = ConvertToSeconds(fmon);
+          diff = Math.abs( fmon - smon );
+          document.getElementById("rangeVal").value = secondsTohhmmss(diff);
+        }
+
+        function ConvertToSeconds(time) {
+          var splitTime = time.split(":");
+          return splitTime[0] * 3600 + splitTime[1] * 60;
+        }
+
+        function secondsTohhmmss(secs) {
+          var hours = parseInt(secs / 3600);
+          var seconds = parseInt(secs % 3600);
+          var minutes = parseInt(seconds / 60) ;
+          return hours + "hours : " + minutes + "minutes ";
+        } 
     }
 
-    window.customElements.define(TimeTrack2App.is, TimeTrack2App);
   </script>
 </dom-module>
