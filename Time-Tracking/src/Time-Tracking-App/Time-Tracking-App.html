@@ -87,8 +87,8 @@
       </vaadin-grid>
 
       <div class="formObjects">
-      <paper-input type="time" id="start" label="Start" onchange="calcRange()" value="{{userRecord.start}}"></paper-input>
-      <paper-input type="time" id="end" label="End" onchange="calcRange()" value="{{userRecord.end}}"></paper-input>
+      <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{userRecord.start}}"></paper-input>
+      <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{userRecord.end}}"></paper-input>
       <paper-input id="rangeVal" label="Range" value="{{userRecord.range}}"></paper-input>
       <paper-button raised on-tap="handleSave" id="saveButton">Save</paper-button>
       <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
@@ -166,7 +166,6 @@
 
       // Function: Save
       handleSave: function() {
-          calcRange();
           var grid = this.$.grid;
           var newDoc = Object.assign({}, this.userRecord);
 
@@ -200,25 +199,21 @@
         });
       },
 
-  });
-
-    // Function: Difference
-    function calcRange(){
-        var smon = document.getElementById('start').value ;
-        var fmon = document.getElementById('end').value ;
+          // Function: Calculate Range (Temporary)
+    calcRange: function() {
+      var smon = this.$.start.value;
+      var fmon = this.$.end.value;
         var diff = 0 ;
         if (smon && fmon) {
           smon = ConvertToSeconds(smon);
           fmon = ConvertToSeconds(fmon);
           diff = Math.abs( fmon - smon );
-          document.getElementById("rangeVal").value = secondsTohhmmss(diff);
+          this.$.rangeVal.value = secondsTohhmmss(diff);
         }
-
         function ConvertToSeconds(time) {
           var splitTime = time.split(":");
           return splitTime[0] * 3600 + splitTime[1] * 60;
         }
-
         function secondsTohhmmss(secs) {
           var hours = parseInt(secs / 3600);
           var seconds = parseInt(secs % 3600);
@@ -226,6 +221,8 @@
           return hours + "hours : " + minutes + "minutes ";
         } 
     }
+
+  });
 
   </script>
 </dom-module>
