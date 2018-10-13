@@ -87,11 +87,13 @@
 
 
 <div class="formObjects">
+<paper-input type="text" id="nameTracker" value="" label="Tracker Name"></paper-input>
+<paper-button raised on-tap="createTracker" id="saveButton">Create Tracker</paper-button>
+<paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
+<paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
 <paper-input type="time" id="starttxt" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
 <paper-input type="time" id="endtxt" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
 <paper-input id="rangeVal" label="Range" value="{{timeRecord.range}}">Range</paper-input>
-<paper-button raised on-tap="handleSave" id="saveButton">Save</paper-button>
-<paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
 </div>
 
 
@@ -138,6 +140,11 @@
             console.log(err);
           });
         };
+      },
+
+      createTracker: function(){
+        this.$.starttxt.value = (new Date).toTimeString().slice(0,8);
+        this.$.endtxt.value = (new Date).toTimeString().slice(0,8);
       },
 
       // Function: Selection
