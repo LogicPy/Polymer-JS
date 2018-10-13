@@ -23,6 +23,10 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-filter.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
 
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet">
+
 <!-- Database Components -->
 <script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
 
@@ -32,7 +36,26 @@
       :host {
         display: block;
       }
+      h2
+      {
+        font-family: 'Lobster', cursive;
+        font-size: 40px;
+      }
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        color: black;
+        text-align: center;
+        border-top-color: black;
+        border-top-width: 1px;
+        border-top-style: solid;
+        font-family: 'K2D', sans-serif;
+    }
     </style>
+
+    <h2>Time Tracker</h2>
 
 <!-- Grid Space -->
     <iron-ajax auto url="" handle-as="json" last-response="{{times}}"></iron-ajax>
@@ -62,13 +85,16 @@
 
     </vaadin-grid>
 
-<input type="time" id="starttxt" name="">
-<input type="time" id="endtxt" name="">
-<input type="text" id="rangeVal" name="">
 
+<div class="formObjects">
+<paper-input type="time" id="starttxt" label="Start" onchange="calcRange()" value="{{userRecord.start}}"></paper-input>
+<paper-input type="time" id="endtxt" label="End" onchange="calcRange()" value="{{userRecord.end}}"></paper-input>
+<paper-input id="rangeVal" label="Range" value="{{userRecord.range}}">Range</paper-input>
 <paper-button raised on-tap="handleSave" id="saveButton">Save</paper-button>
 <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
 <paper-button raised on-tap="calcRange" id="">Range</paper-button>
+</div>
+
 
   </template>
 
@@ -90,9 +116,85 @@
         },
       },
 
-    ready: function() {
+      // Function: Database Definition
+      created: function() {
+        _db = new PouchDB('times');
+      },
 
-    },
+      // Function: On_Load
+      ready: function() {
+        var grid = this.$.grid;
+
+        grid.items = function(params, callback) {
+          _db.allDocs({
+            include_docs: true,
+            skip: params.index,
+            limit: params.count,
+          }).then(function(response) {
+            var rows = response.rows.map(function(row) {
+              return row.doc;
+            });
+            callback(rows, response.total_rows)
+          }).catch(function(err) {
+            console.log(err);
+          });
+        };
+      },
+
+      // Function: Selection
+      handleSelect: function(e) {
+        var grid = this.$.grid;
+
+        // Clear
+        if (grid.selection.size === 0) {
+          this.set('userRecord', {});
+          this.$.deleteButton.disabled = true;
+          return;
+        }
+
+        var index = grid.selection.selected()[0];
+
+        grid.getItem(index, function(err, item) {
+          this.set('userRecord', Object.assign({}, item));
+          this.$.deleteButton.disabled = false;
+        }.bind(this));
+      },
+
+      // Function: Save
+      handleSave: function() {
+          calcRange();
+          var grid = this.$.grid;
+          var newDoc = Object.assign({}, this.userRecord);
+
+          if (!newDoc.hasOwnProperty('_id')) {
+            newDoc._id = new Date().toISOString();
+          }
+
+          _db.upsert(newDoc._id, function(doc) {
+
+            newDoc._rev = doc._rev;
+            return newDoc;
+          }).then(function(doc) {
+            grid.refreshItems();
+            grid.selection.clear();
+          }).catch(function(err) {
+            console.log(err)
+          });
+      
+      },
+
+      // Function: Delete
+      handleDelete: function() {
+        var grid = this.$.grid;
+
+        _db.remove(this.userRecord._id, this.userRecord._rev).then(function(doc) {
+          grid.selection.clear();
+        }).then(function(doc) {
+          grid.refreshItems();
+        }).catch(function(err) {
+          console.log(err);
+        });
+      },
 
     calcRange: function() {
       var smon = this.$.starttxt.value;
