@@ -42,10 +42,11 @@
       :host {
         display: block;
       }
-      h2
+      .App_Title
       {
         font-family: 'Lobster', cursive;
         font-size: 40px;
+        margin-left: 20px;
       }
     .footer {
         position: fixed;
@@ -59,9 +60,24 @@
         border-top-style: solid;
         font-family: 'K2D', sans-serif;
     }
+
+    .form_Whole
+    {
+      width:80%;
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+    }
+
+    @media only screen and (max-width: 750px) {
+      .form_Whole
+      {
+        width: 100%;
+      }
+    }
     </style>
 
-    <h2>Time Tracker</h2>
+    <h2 class="App_Title">Time Tracker 2</h2>
 
 <!-- Grid Space -->
 
@@ -74,22 +90,25 @@
     auto>
 </iron-ajax>-->
 
-<!--
-<vaadin-grid items="[[timeData]]" id="grid" on-selected-items-changed="handleSelect">
-    <vaadin-grid-column>      
-      <template class="header">Start</template>      
-      <template>[[item.full_name]]</template>
-    </vaadin-grid-column>
-    <vaadin-grid-column>
-      <template class="header">End</template>
-      <template>[[item.html_url]]</template>    
-    </vaadin-grid-column>    
-    <vaadin-grid-column>      
-      <template class="header">Range</template>      
-      <template>[[item.description]]</template>    
-    </vaadin-grid-column> 
-</vaadin-grid>-->
+<div class="form_Whole">
 
+<div class="grid_Container">
+  <vaadin-grid items="[[timeData]]" id="grid" on-selected-items-changed="handleSelect">
+      <vaadin-grid-column>      
+        <template class="header">Start</template>      
+        <template>[[item.full_name]]</template>
+      </vaadin-grid-column>
+      <vaadin-grid-column>
+        <template class="header">End</template>
+        <template>[[item.html_url]]</template>    
+      </vaadin-grid-column>    
+      <vaadin-grid-column>      
+        <template class="header">Range</template>      
+        <template>[[item.description]]</template>    
+      </vaadin-grid-column> 
+  </vaadin-grid>
+</div>
+<!--
 <vaadin-grid id="grid" on-selected-items-changed="handleSelect">
   <table>
     <colgroup>
@@ -99,17 +118,24 @@
     </colgroup>
   </table>
 </vaadin-grid>
+-->
 
-<div class="formObjects">
-<paper-input type="text" id="nameTracker" value="" label="Tracker Name"></paper-input>
-<paper-button raised on-tap="createTracker" id="saveButton">Create Tracker</paper-button>
-<paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
-<paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
-<paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
-<paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
-<paper-input id="rangeVal" label="Range" value="{{timeRecord.range}}">Range</paper-input>
+<div class="form_Objects">
+  <paper-input type="text" id="nameTracker" value="" label="Tracker Name"></paper-input>
+  <paper-button raised on-tap="createTracker" id="saveButton">Create Tracker</paper-button>
+  <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
+  <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
+  <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
+  <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
+  <paper-input id="rangeVal" label="Range" value="{{timeRecord.range}}">Range</paper-input>
+  <paper-button raised on-tap="helpClick">Help</paper-button>
 </div>
 
+</div>
+
+  <div class="footer">
+    <p>Time Tracker 2 / 2018</p>
+  </div>
 
   </template>
 
@@ -140,6 +166,7 @@
       // Function: On_Load
       ready: function() {
         var grid = this.$.grid;
+
         grid.items = function(params, callback) {
           _db.allDocs({
             include_docs: true,
@@ -172,6 +199,18 @@
       // Function: Selection
       handleSelect: function(e) {
         var grid = this.$.grid;
+
+        // Clear
+        if (grid.size === 0) {
+          this.set('userRecord', {});
+          this.$.deleteButton.disabled = true;
+          return;
+        }
+        var index = grid.selected;
+        grid.get(index, function(err, item) {
+          this.set('userRecord', Object.assign({}, item));
+          this.$.deleteButton.disabled = false;
+        }.bind(this));
 
       },
 
@@ -210,6 +249,11 @@
           console.log(err);
         });
       },
+
+    // Function: Help Button MessageBox
+    helpClick: function(){
+      alert("This is an updated version of Time Tracker that uses only Polymer 2.x web components including the most up-to-date version of Vaadin Grid.\n\n 1) Create tracker by clicking 'Create Tracker'\n 2) Tracking will begin at your current time and end when you click 'Stop and Save'\n 3) Tracker details including start time, end time and duration between the two times will be logged and saved.\n\n Coded by Wayne")
+    },
 
     // Function: Calculate Range (Temporary)
     calcRange: function() {
