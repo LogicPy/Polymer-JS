@@ -45,7 +45,7 @@
       }
       .form
       {
-        width: 95% !important;
+        width: 95%;
         margin-left: auto;
         margin-right: auto;
         display: block;
@@ -90,7 +90,8 @@
       <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{userRecord.start}}"></paper-input>
       <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{userRecord.end}}"></paper-input>
       <paper-input id="rangeVal" label="Range" value="{{userRecord.range}}"></paper-input>
-      <paper-button raised on-tap="handleSave" id="saveButton">Save</paper-button>
+      <paper-button raised on-tap="handleSet" id="setButton">Start</paper-button>
+      <paper-button raised on-tap="handleSave" id="saveButton">Stop</paper-button>
       <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
       </div>
 
@@ -145,6 +146,12 @@
         };
       },
 
+      // Function: Handle Time Setter
+      handleSet: function() {
+        this.$.start.value =(new Date).toTimeString().slice(0,8);
+        this.$.end.value = (new Date).toTimeString().slice(0,8);  
+      },
+
       // Function: Selection
       handleSelect: function(e) {
         var grid = this.$.grid;
@@ -166,6 +173,7 @@
 
       // Function: Save
       handleSave: function() {
+          this.$.end.value = (new Date).toTimeString().slice(0,8); 
           var grid = this.$.grid;
           var newDoc = Object.assign({}, this.userRecord);
 
@@ -199,7 +207,7 @@
         });
       },
 
-          // Function: Calculate Range (Temporary)
+    // Function: Calculate Range (Temporary)
     calcRange: function() {
       var smon = this.$.start.value;
       var fmon = this.$.end.value;
