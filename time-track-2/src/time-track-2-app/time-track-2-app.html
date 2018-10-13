@@ -115,6 +115,10 @@
             return {};
           },
         },
+      delay: {
+        type: Number,
+        value: 5000
+        }
       },
 
       // Function: Database Definition
@@ -143,6 +147,14 @@
       },
 
       createTracker: function(){
+        if(this.$.nameTracker.value == "")
+        {
+          this.$.nameTracker.value = "Tracker";
+        }
+        else
+        {
+          // Already occupied
+        }
         this.$.starttxt.value = (new Date).toTimeString().slice(0,8);
         this.$.endtxt.value = (new Date).toTimeString().slice(0,8);
       },
@@ -168,24 +180,30 @@
 
       // Function: Save
       handleSave: function() {
-          var grid = this.$.grid;
-          var newDoc = Object.assign({}, this.timeRecord);
+          this.$.endtxt.value = (new Date).toTimeString().slice(0,8);
 
-          if (!newDoc.hasOwnProperty('_id')) {
-            newDoc._id = new Date().toISOString();
-          }
+          //var grid = this.$.grid;
+          //var newDoc = Object.assign({}, this.timeRecord);
 
-          _db.upsert(newDoc._id, function(doc) {
+          //if (!newDoc.hasOwnProperty('_id')) {
+          //  newDoc._id = new Date().toISOString();
+          //}
 
-            newDoc._rev = doc._rev;
-            return newDoc;
-          }).then(function(doc) {
-            grid.refreshItems();
-            grid.selection.clear();
-          }).catch(function(err) {
-            console.log(err)
-          });
+          //_db.upsert(newDoc._id, function(doc) {
+
+          //  newDoc._rev = doc._rev;
+          //  return newDoc;
+          //}).then(function(doc) {
+          //  grid.refreshItems();
+          //  grid.selection.clear();
+          //}).catch(function(err) {
+          //  console.log(err)
+          //});
       
+          this.$.nameTracker.value = "";
+          this.$.starttxt.value = "";
+          this.$.endtxt.value = "";
+          this.$.rangeVal.value = "";
       },
 
       // Function: Delete
@@ -201,6 +219,7 @@
         });
       },
 
+    // Function: Calculate Range (Temporary)
     calcRange: function() {
       var smon = this.$.starttxt.value;
       var fmon = this.$.endtxt.value;
@@ -226,7 +245,6 @@
     }
 
   });
-
 
   </script>
 </dom-module>
