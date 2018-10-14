@@ -160,23 +160,23 @@
 
       // Function: On_Load
       ready: function() {
+
         var grid = this.$.grid;
 
-        grid.items = function(params, callback) {
-          _db.allDocs({
-            include_docs: true,
-            skip: params.index,
-            limit: params.count,
-          }).then(function(response) {
-            var rows = response.rows.map(function(row) {
-              return row.doc;
-            });
-            callback(rows, response.total_rows)
-          }).catch(function(err) {
-            console.log(err);
+        var options = {}
+
+        // New row extraction routine
+        _db.allDocs(options, function(error, response) {
+        // map new array for all rows
+        var rows = response.rows.map(function(row) {
+          console.log(row);
+          return row.doc;
           });
-        };
-      },
+        
+        grid.items = rows;
+      })
+    }
+      ,
 
       // Function: Selection
       handleSelect: function(e) {
