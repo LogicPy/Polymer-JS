@@ -82,21 +82,9 @@
 
 <div class="form_Whole">
 
-  <x-array-data-provider></x-array-data-provider>
-
-  <!-- ajax Grid Testing -->
- <!--<iron-ajax
-      url="https://api.github.com/users/vaadin/repos"
-      params='{"type":"all"}'
-      handle-as="json"
-      last-response="{{timeData}}"
-      auto>
-  </iron-ajax>-->
-
   <!-- Grid Space -->
-  <vaadin-grid id="grid" on-selected-items-changed="handleSelect">
-      <vaadin-grid-selection-column auto-select>
-      </vaadin-grid-selection-column>
+  <vaadin-grid id="grid" on-selected-items-changed="handleSelect" active-item="{{activeItem}}">
+
     <vaadin-grid-column>
       <template class="header">Task</template>
       <template>[[item.task]]</template>
@@ -149,6 +137,9 @@
             return {};
           },
         },
+        activeItem: {
+            observer: '_activeItemChanged'
+          }
       },
 
       // Function: Database Definition
@@ -156,36 +147,36 @@
         _db = new PouchDB('times');
       },
 
-
-      // ----------------------------------------------
-      // ------------- Trouble Functions --------------
+      _activeItemChanged: function(item) {
+        this.$.grid.selectedItems = item ? [item] : [];
+      },
 
       // Function: On_Load
       ready: function() {
 
         var grid = this.$.grid;
 
-        var options = {}
+        var options = {};
 
         options.include_docs = true;
 
         // New row extraction routine
         _db.allDocs(options, function(error, response) {
-        // map new array for all rows
+        // map new array rows
         var rows = response.rows.map(function(row) {
-          console.log(row);
           return row.doc;
           });
-
-          console.log(rows,response.total_rows);
           grid.items = rows;
       })
     },
 
+      // ----------------------------------------------
+      // ------------- Trouble Functions --------------
+
       // Function: Selection
       handleSelect: function(e) {
         var grid = this.$.grid;
-
+        // Clear
         // Clear
         if (grid.selectedItems.length > 0) {
           this.$.deleteButton.disabled = false;
@@ -199,14 +190,13 @@
           this.$.editButton.disabled = true;
           return;
         }
-        var index = grid.index()[0];
-
-        grid.getItem(index, function(err, item) {
+        var index = grid.selectedItems[0];
+        console.log(index);
+        grid.get(index, function(err, item) {
           this.set('item', Object.assign({}, item));
           this.$.deleteButton.disabled = false;
           this.$.editButton.disabled = false;
         }.bind(this));
-
       },
 
       // Function: Delete
@@ -222,6 +212,9 @@
         });
       },
 
+        _activeItemChanged: function(item) {
+          this.$.grid.selectedItems = item ? [item] : [];
+        },
 
       // ----------------------------------------------
       // ------------- Working Functions --------------
