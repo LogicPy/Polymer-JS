@@ -91,8 +91,10 @@
       <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{userRecord.start}}"></paper-input>
       <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{userRecord.end}}"></paper-input>
       <paper-input id="rangeVal" label="Range" value="{{userRecord.range}}"></paper-input>
+      
       <paper-button raised on-tap="handleSet" id="setButton">Start</paper-button>
       <paper-button raised on-tap="handleSave" id="saveButton">Stop</paper-button>
+      <paper-button raised on-tap="handleSave" id="editButton" disabled>Save</paper-button>
       <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
       </div>
 
@@ -161,6 +163,7 @@
         if (grid.selection.size === 0) {
           this.set('userRecord', {});
           this.$.deleteButton.disabled = true;
+          this.$.editButton.disabled = true;
           return;
         }
 
@@ -169,6 +172,7 @@
         grid.getItem(index, function(err, item) {
           this.set('userRecord', Object.assign({}, item));
           this.$.deleteButton.disabled = false;
+          this.$.editButton.disabled = false;
         }.bind(this));
       },
 
