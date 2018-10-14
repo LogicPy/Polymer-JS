@@ -116,7 +116,7 @@
 
   <div class="form_Objects">
     <paper-input type="text" id="task" label="Tracker Name" value="{{timeRecord.task}}"></paper-input>
-    <paper-button raised on-tap="createTracker" id="saveButton">Create Tracker</paper-button>
+    <paper-button raised on-tap="createTracker" id="saveButton">Start Recording</paper-button>
     <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
     <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
     <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
@@ -158,6 +158,10 @@
         _db = new PouchDB('times');
       },
 
+
+      // ----------------------------------------------
+      // ------------- Trouble Functions --------------
+
       // Function: On_Load
       ready: function() {
         var grid = this.$.grid;
@@ -178,20 +182,6 @@
         };
       },
 
-      // Function: Activate Tracker Application
-      createTracker: function(){
-        if(this.$.task.value == "")
-        {
-          this.$.task.value = "Tracker";
-        }
-        else
-        {
-          // Textbox already occupied
-        }
-        this.$.start.value = (new Date).toTimeString().slice(0,8);
-        this.$.end.value = (new Date).toTimeString().slice(0,8);
-      },
-
       // Function: Selection
       handleSelect: function(e) {
         var grid = this.$.grid;
@@ -207,6 +197,36 @@
           this.set('timeRecord', Object.assign({}, item));
           this.$.deleteButton.disabled = false;
         }.bind(this));
+
+      },
+
+      // Function: Delete
+      handleDelete: function() {
+        var grid = this.$.grid;
+        _db.remove(this.timeRecord._id, this.timeRecord._rev).then(function(doc) {
+
+        }).then(function(doc) {
+
+        }).catch(function(err) {
+          console.log(err);
+        });
+      },
+
+
+      // ----------------------------------------------
+      // ------------- Working Functions --------------
+
+      // Function: Activate Tracker Application
+      createTracker: function(){
+        if(this.$.task.value == "")
+        {
+          this.$.task.value = "Tracker";
+        }
+        else
+        {
+          // Textbox already occupied
+        }
+        this.$.start.value = (new Date).toTimeString().slice(0,8);
 
       },
 
@@ -234,18 +254,6 @@
           this.$.rangeVal.value = "";
       },
 
-      // Function: Delete
-      handleDelete: function() {
-        var grid = this.$.grid;
-        _db.remove(this.timeRecord._id, this.timeRecord._rev).then(function(doc) {
-
-        }).then(function(doc) {
-
-        }).catch(function(err) {
-          console.log(err);
-        });
-      },
-
     // Function: Clear Text Fields
     ClearClick: function(){
         this.$.task.value = "";
@@ -256,7 +264,7 @@
 
     // Function: Help Button MessageBox
     helpClick: function(){
-      alert("This is an updated version of Time Tracker that uses only Polymer 2.x web components including the most up-to-date version of Vaadin Grid (5.1.0).\n\n 1) Create tracker by clicking 'Create Tracker'\n 2) Tracking will begin at your current time and end when you click 'Stop and Save'\n 3) Tracker details including start time, end time and duration between the two times will be logged and saved.\n\n Coded by Wayne")
+      alert("This is an updated version of Time Tracker that uses only Polymer 2.x web components including the most up-to-date version of Vaadin Grid (5.1.0).\n\n 1) Create tracker by clicking 'Start Recording'\n 2) Tracking will begin at your current time and end when you click 'Stop and Save'\n 3) Tracker details including start time, end time and duration between the two times will be logged and saved.\n\n Coded by Wayne")
     },
 
     // Function: Calculate Range (Temporary)
