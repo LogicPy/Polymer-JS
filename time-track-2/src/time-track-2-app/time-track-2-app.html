@@ -77,59 +77,49 @@
     }
     </style>
 
-    <h2 class="App_Title">Time Tracker 2</h2>
-
-<!-- Grid Space -->
-
-<!-- ajax Grid Testing -->
-<!--<iron-ajax
-    url="https://api.github.com/users/vaadin/repos"
-    params='{"type":"all"}'
-    handle-as="json"
-    last-response="{{timeData}}"
-    auto>
-</iron-ajax>-->
+  <h2 class="App_Title">Time Tracker 2</h2>
 
 <div class="form_Whole">
 
-<div class="grid_Container">
-  <vaadin-grid items="[[timeData]]" id="grid" on-selected-items-changed="handleSelect">
-      <vaadin-grid-column>      
-        <template class="header">Start</template>      
-        <template>[[item.full_name]]</template>
-      </vaadin-grid-column>
-      <vaadin-grid-column>
-        <template class="header">End</template>
-        <template>[[item.html_url]]</template>    
-      </vaadin-grid-column>    
-      <vaadin-grid-column>      
-        <template class="header">Range</template>      
-        <template>[[item.description]]</template>    
-      </vaadin-grid-column> 
-  </vaadin-grid>
-</div>
-<!--
-<vaadin-grid id="grid" on-selected-items-changed="handleSelect">
-  <table>
-    <colgroup>
-      <col name="start">
-      <col name="end">
-      <col name="range">
-    </colgroup>
-  </table>
-</vaadin-grid>
--->
+  <x-array-data-provider></x-array-data-provider>
 
-<div class="form_Objects">
-  <paper-input type="text" id="nameTracker" value="" label="Tracker Name"></paper-input>
-  <paper-button raised on-tap="createTracker" id="saveButton">Create Tracker</paper-button>
-  <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
-  <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
-  <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
-  <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
-  <paper-input id="rangeVal" label="Range" value="{{timeRecord.range}}">Range</paper-input>
-  <paper-button raised on-tap="helpClick">Help</paper-button>
-</div>
+  <!-- ajax Grid Testing -->
+  <iron-ajax
+      url="https://api.github.com/users/vaadin/repos"
+      params='{"type":"all"}'
+      handle-as="json"
+      last-response="{{timeData}}"
+      auto>
+  </iron-ajax>
+
+  <!-- Grid Space -->
+  <vaadin-grid theme="compact" items="[[timeData]]">
+    <vaadin-grid-column name="Start" resizable>
+          <template class="header">Start</template>      
+          <template>[[item.full_name]]</template>
+    </vaadin-grid-column>
+    <vaadin-grid-column name="End" resizable>
+          <template class="header">End</template>
+          <template>[[item.html_url]]</template>   
+    </vaadin-grid-column>
+    <vaadin-grid-column name="Range" width="12em" resizable>
+          <template class="header">Range</template>      
+          <template>[[item.description]]</template>   
+    </vaadin-grid-column>
+    <vaadin-grid-column width="1em"></vaadin-grid-column>
+  </vaadin-grid>
+
+  <div class="form_Objects">
+    <paper-input type="text" id="nameTracker" value="" label="Tracker Name"></paper-input>
+    <paper-button raised on-tap="createTracker" id="saveButton">Create Tracker</paper-button>
+    <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
+    <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
+    <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
+    <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
+    <paper-input id="rangeVal" label="Range" value="{{timeRecord.range}}">Range</paper-input>
+    <paper-button raised on-tap="ClearClick">Clear</paper-button>
+    <paper-button raised on-tap="helpClick">About</paper-button>
+  </div>
 
 </div>
 
@@ -183,6 +173,7 @@
         };
       },
 
+      // Function: Activate Tracker Application
       createTracker: function(){
         if(this.$.nameTracker.value == "")
         {
@@ -249,6 +240,14 @@
           console.log(err);
         });
       },
+
+    // Function: Clear Text Fields
+    ClearClick: function(){
+        this.$.nameTracker.value = "";
+        this.$.start.value = "";
+        this.$.end.value = "";
+        this.$.rangeVal.value = "";   
+    },
 
     // Function: Help Button MessageBox
     helpClick: function(){
