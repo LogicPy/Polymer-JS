@@ -118,6 +118,7 @@
     <paper-button raised on-tap="createTracker" id="saveButton">Start Recording</paper-button>
     <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
     <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
+    <paper-button raised on-tap="handleSave" id="editButton" disabled>Edit</paper-button>
     <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
     <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
     <paper-input id="rangeVal" label="Range" value="{{timeRecord.range}}">Range</paper-input>
@@ -146,10 +147,6 @@
             return {};
           },
         },
-      delay: {
-        type: Number,
-        value: 5000
-        }
       },
 
       // Function: Database Definition
@@ -189,12 +186,14 @@
         if (grid.size === 0) {
           this.set('timeRecord', {});
           this.$.deleteButton.disabled = true;
+          this.$.editButton.disabled = true;
           return;
         }
         var index = grid.selected;
         grid.get(index, function(err, item) {
           this.set('timeRecord', Object.assign({}, item));
           this.$.deleteButton.disabled = false;
+          this.$.editButton.disabled = false;
         }.bind(this));
 
       },
