@@ -94,34 +94,36 @@
   </iron-ajax>-->
 
   <!-- Grid Space -->
-  <vaadin-grid id="grid">
+  <vaadin-grid id="grid" on-selected-items-changed="handleSelect">
+      <vaadin-grid-selection-column auto-select>
+      </vaadin-grid-selection-column>
     <vaadin-grid-column>
       <template class="header">Task</template>
-      <template>[[timeRecord.task]]</template>
+      <template>[[item.task]]</template>
     </vaadin-grid-column>
     <vaadin-grid-column>
       <template class="header">Start</template>
-      <template>[[timeRecord.start]]</template>
+      <template>[[item.start]]</template>
     </vaadin-grid-column>
     <vaadin-grid-column>
       <template class="header">End</template>
-      <template>[[timeRecord.end]]</template>
+      <template>[[item.end]]</template>
     </vaadin-grid-column>
     <vaadin-grid-column>
       <template class="header">Range</template>
-      <template>[[timeRecord.range]]</template>
+      <template>[[item.range]]</template>
     </vaadin-grid-column>
   </vaadin-grid>
 
   <div class="form_Objects">
-    <paper-input type="text" id="task" label="Tracker Name" value="{{timeRecord.task}}"></paper-input>
+    <paper-input type="text" id="task" label="Tracker Name" value="{{item.task}}"></paper-input>
     <paper-button raised on-tap="createTracker" id="saveButton">Start Recording</paper-button>
     <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
     <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
     <paper-button raised on-tap="handleSave" id="editButton" disabled>Edit</paper-button>
-    <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeRecord.start}}"></paper-input>
-    <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeRecord.end}}"></paper-input>
-    <paper-input id="rangeVal" label="Range" value="{{timeRecord.range}}">Range</paper-input>
+    <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{item.start}}"></paper-input>
+    <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{item.end}}"></paper-input>
+    <paper-input id="rangeVal" label="Range" value="{{item.range}}">Range</paper-input>
     <paper-button raised on-tap="ClearClick">Clear</paper-button>
     <paper-button raised on-tap="helpClick">About</paper-button>
   </div>
@@ -141,7 +143,7 @@
       properties: {
         _db: Object,
         // Values
-        timeRecord: {
+        item: {
           type: Object,
           value: function() {
             return {};
@@ -165,6 +167,8 @@
 
         var options = {}
 
+        options.include_docs = true;
+
         // New row extraction routine
         _db.allDocs(options, function(error, response) {
         // map new array for all rows
@@ -172,26 +176,33 @@
           console.log(row);
           return row.doc;
           });
-        
-        grid.items = rows;
+
+          console.log(rows,response.total_rows);
+          grid.items = rows;
       })
-    }
-      ,
+    },
 
       // Function: Selection
       handleSelect: function(e) {
         var grid = this.$.grid;
 
         // Clear
-        if (grid.size === 0) {
-          this.set('timeRecord', {});
+        if (grid.selectedItems.length > 0) {
+          this.$.deleteButton.disabled = false;
+          this.$.editButton.disabled = false;
+          return;
+        }
+        else
+        {
+          this.set('item', {});
           this.$.deleteButton.disabled = true;
           this.$.editButton.disabled = true;
           return;
         }
-        var index = grid.selected;
-        grid.get(index, function(err, item) {
-          this.set('timeRecord', Object.assign({}, item));
+        var index = grid.index()[0];
+
+        grid.getItem(index, function(err, item) {
+          this.set('item', Object.assign({}, item));
           this.$.deleteButton.disabled = false;
           this.$.editButton.disabled = false;
         }.bind(this));
@@ -201,10 +212,11 @@
       // Function: Delete
       handleDelete: function() {
         var grid = this.$.grid;
-        _db.remove(this.timeRecord._id, this.timeRecord._rev).then(function(doc) {
-
+        _db.remove(this.item._id, this.item._rev).then(function(doc) {
+          grid.item.clear();
         }).then(function(doc) {
-
+          // update Grid
+          grid.clearCache();
         }).catch(function(err) {
           console.log(err);
         });
@@ -232,7 +244,7 @@
       handleSave: function() {
           this.$.end.value = (new Date).toTimeString().slice(0,8);
           var grid = this.$.grid;
-          var newDoc = Object.assign({}, this.timeRecord);
+          var newDoc = Object.assign({}, this.item);
           if (!newDoc.hasOwnProperty('_id')) {
             newDoc._id = new Date().toISOString();
           }
@@ -250,6 +262,7 @@
           this.$.start.value = "";
           this.$.end.value = "";
           this.$.rangeVal.value = "";
+
       },
 
     // Function: Clear Text Fields
