@@ -79,6 +79,7 @@
       <vaadin-grid id="grid" on-selected-items-changed="handleSelect">
         <table>
           <colgroup>
+            <col name="task">
             <col name="start">
             <col name="end">
             <col name="range">
@@ -87,6 +88,7 @@
       </vaadin-grid>
 
       <div class="formObjects">
+      <paper-input type="text" id="task" label="Task" value="{{userRecord.task}}"></paper-input>
       <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{userRecord.start}}"></paper-input>
       <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{userRecord.end}}"></paper-input>
       <paper-input id="rangeVal" label="Range" value="{{userRecord.range}}"></paper-input>
