@@ -94,24 +94,23 @@
   </iron-ajax>-->
 
   <!-- Grid Space -->
-  <vaadin-grid theme="compact" items="[[timeData]]" id="grid">
-    <vaadin-grid-column name="task" resizable>
-          <template class="header">Task</template>      
-          <template name="task">[[timeRecord.task]]</template>
+  <vaadin-grid id="grid">
+    <vaadin-grid-column>
+      <template class="header">Task</template>
+      <template>[[timeRecord.task]]</template>
     </vaadin-grid-column>
-    <vaadin-grid-column name="start" resizable>
-          <template class="header">Start</template>      
-          <template name="start">[[timeRecord.start]]</template>
+    <vaadin-grid-column>
+      <template class="header">Start</template>
+      <template>[[timeRecord.start]]</template>
     </vaadin-grid-column>
-    <vaadin-grid-column name="end" resizable>
-          <template class="header">End</template>
-          <template name="end">[[timeRecord.end]]</template>   
+    <vaadin-grid-column>
+      <template class="header">End</template>
+      <template>[[timeRecord.end]]</template>
     </vaadin-grid-column>
-    <vaadin-grid-column name="range" width="12em" resizable>
-          <template class="header">Range</template>      
-          <template name="range">[[timeRecord.range]]</template>   
+    <vaadin-grid-column>
+      <template class="header">Range</template>
+      <template>[[timeRecord.range]]</template>
     </vaadin-grid-column>
-    <vaadin-grid-column width="1em"></vaadin-grid-column>
   </vaadin-grid>
 
   <div class="form_Objects">
