@@ -20,9 +20,10 @@
 <!-- Vaadin Grid -->
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column-group.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-filter.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
-<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-tree-toggle.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
 
 <!-- Iron Ajax -->
@@ -84,33 +85,37 @@
   <x-array-data-provider></x-array-data-provider>
 
   <!-- ajax Grid Testing -->
-  <iron-ajax
+ <!--<iron-ajax
       url="https://api.github.com/users/vaadin/repos"
       params='{"type":"all"}'
       handle-as="json"
       last-response="{{timeData}}"
       auto>
-  </iron-ajax>
+  </iron-ajax>-->
 
   <!-- Grid Space -->
-  <vaadin-grid theme="compact" items="[[timeData]]">
-    <vaadin-grid-column name="Start" resizable>
+  <vaadin-grid theme="compact" items="[[timeData]]" id="grid">
+    <vaadin-grid-column name="task" resizable>
+          <template class="header">Task</template>      
+          <template name="task">[[timeRecord.task]]</template>
+    </vaadin-grid-column>
+    <vaadin-grid-column name="start" resizable>
           <template class="header">Start</template>      
-          <template>[[item.full_name]]</template>
+          <template name="start">[[timeRecord.start]]</template>
     </vaadin-grid-column>
-    <vaadin-grid-column name="End" resizable>
+    <vaadin-grid-column name="end" resizable>
           <template class="header">End</template>
-          <template>[[item.html_url]]</template>   
+          <template name="end">[[timeRecord.end]]</template>   
     </vaadin-grid-column>
-    <vaadin-grid-column name="Range" width="12em" resizable>
+    <vaadin-grid-column name="range" width="12em" resizable>
           <template class="header">Range</template>      
-          <template>[[item.description]]</template>   
+          <template name="range">[[timeRecord.range]]</template>   
     </vaadin-grid-column>
     <vaadin-grid-column width="1em"></vaadin-grid-column>
   </vaadin-grid>
 
   <div class="form_Objects">
-    <paper-input type="text" id="nameTracker" value="" label="Tracker Name"></paper-input>
+    <paper-input type="text" id="task" label="Tracker Name" value="{{timeRecord.task}}"></paper-input>
     <paper-button raised on-tap="createTracker" id="saveButton">Create Tracker</paper-button>
     <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
     <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
@@ -175,9 +180,9 @@
 
       // Function: Activate Tracker Application
       createTracker: function(){
-        if(this.$.nameTracker.value == "")
+        if(this.$.task.value == "")
         {
-          this.$.nameTracker.value = "Tracker";
+          this.$.task.value = "Tracker";
         }
         else
         {
@@ -193,19 +198,19 @@
 
         // Clear
         if (grid.size === 0) {
-          this.set('userRecord', {});
+          this.set('timeRecord', {});
           this.$.deleteButton.disabled = true;
           return;
         }
         var index = grid.selected;
         grid.get(index, function(err, item) {
-          this.set('userRecord', Object.assign({}, item));
+          this.set('timeRecord', Object.assign({}, item));
           this.$.deleteButton.disabled = false;
         }.bind(this));
 
       },
 
-      // Function: Save
+      // Function: Save (works)
       handleSave: function() {
           this.$.end.value = (new Date).toTimeString().slice(0,8);
           var grid = this.$.grid;
@@ -217,13 +222,13 @@
             newDoc._rev = doc._rev;
             return newDoc;
           }).then(function(doc) {
-            grid.refreshItems();
-            grid.selection.clear();
+
+
           }).catch(function(err) {
             console.log(err)
           });
       
-          this.$.nameTracker.value = "";
+          this.$.task.value = "";
           this.$.start.value = "";
           this.$.end.value = "";
           this.$.rangeVal.value = "";
@@ -233,9 +238,9 @@
       handleDelete: function() {
         var grid = this.$.grid;
         _db.remove(this.timeRecord._id, this.timeRecord._rev).then(function(doc) {
-          grid.selection.clear();
+
         }).then(function(doc) {
-          grid.refreshItems();
+
         }).catch(function(err) {
           console.log(err);
         });
@@ -243,7 +248,7 @@
 
     // Function: Clear Text Fields
     ClearClick: function(){
-        this.$.nameTracker.value = "";
+        this.$.task.value = "";
         this.$.start.value = "";
         this.$.end.value = "";
         this.$.rangeVal.value = "";   
@@ -251,7 +256,7 @@
 
     // Function: Help Button MessageBox
     helpClick: function(){
-      alert("This is an updated version of Time Tracker that uses only Polymer 2.x web components including the most up-to-date version of Vaadin Grid.\n\n 1) Create tracker by clicking 'Create Tracker'\n 2) Tracking will begin at your current time and end when you click 'Stop and Save'\n 3) Tracker details including start time, end time and duration between the two times will be logged and saved.\n\n Coded by Wayne")
+      alert("This is an updated version of Time Tracker that uses only Polymer 2.x web components including the most up-to-date version of Vaadin Grid (5.1.0).\n\n 1) Create tracker by clicking 'Create Tracker'\n 2) Tracking will begin at your current time and end when you click 'Stop and Save'\n 3) Tracker details including start time, end time and duration between the two times will be logged and saved.\n\n Coded by Wayne")
     },
 
     // Function: Calculate Range (Temporary)
