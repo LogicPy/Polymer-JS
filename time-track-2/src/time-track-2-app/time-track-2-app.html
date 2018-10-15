@@ -168,6 +168,7 @@
         var rows = response.rows.map(function(row) {
           return row.doc;
           });
+          // Append local db rows to Vaadin grid
           grid.items = rows;
       })
     },
@@ -178,8 +179,8 @@
       // Function: Selection
       handleSelect: function(e) {
         var grid = this.$.grid;
-        // Clear
-        // Clear
+
+        // Determine which item is selected in this construct
         if (grid.selectedItems.length > 0) {
           this.$.deleteButton.disabled = false;
           this.$.editButton.disabled = false;
@@ -192,6 +193,8 @@
           this.$.editButton.disabled = true;
           return;
         }
+
+        // under construction
         var index = grid.selectedItems[0];
         console.log(index);
         grid.get(index, function(err, item) {
@@ -216,15 +219,13 @@
       // Function: Delete
       handleDelete: function() {
         var grid = this.$.grid;
-        _db.remove(this.item._id, this.item._rev).then(function(doc) {
-          grid.item.clear();
+        console.log(grid.selectedItems[0]);
+        // Figured it out!
+        // grid.selectedItems contains _id and _rev. No more selection.selected...
+        _db.remove(grid.selectedItems[0]._id, grid.selectedItems[0]._rev);
 
-        }).then(function(doc) {
-          // update Grid
-          grid.clearCache();
-        }).catch(function(err) {
-          console.log(err);
-        });
+    
+
       },
 
         _activeItemChanged: function(item) {
