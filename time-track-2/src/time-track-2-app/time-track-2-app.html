@@ -156,6 +156,8 @@
 
         // Vaadin Grid + PouchDB
 
+        this.$.stopButton.disabled = true;
+
         var grid = this.$.grid;
 
         var options = {};
@@ -273,6 +275,7 @@
         // Starting Time
         this.$.start.value = (new Date).toTimeString().slice(0,8);
         this.$.saveButton.disabled = true;
+        this.$.stopButton.disabled = false;
         this.$.statuslbl.innerHTML = "Recording Tracker - Press 'Stop and Save' to stop recording";
 
       },
