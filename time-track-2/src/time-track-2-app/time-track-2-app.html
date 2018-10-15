@@ -108,7 +108,7 @@
     <paper-button raised on-tap="createTracker" id="saveButton">Start Recording</paper-button>
     <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
     <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
-    <paper-button raised on-tap="handleSave" id="editButton" disabled>Edit</paper-button>
+    <paper-button raised on-tap="handleEdit" id="editButton" disabled>Edit</paper-button>
     <paper-button raised on-tap="handleClear" id="clearButton">Clear</paper-button>
 
     <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{item.start}}"></paper-input>
@@ -173,9 +173,6 @@
       })
     },
 
-      // ----------------------------------------------
-      // ------------- Trouble Functions --------------
-
       // Function: Selection
       handleSelect: function(e) {
         var grid = this.$.grid;
@@ -184,24 +181,26 @@
         if (grid.selectedItems.length > 0) {
           this.$.deleteButton.disabled = false;
           this.$.editButton.disabled = false;
-          return;
         }
         else
         {
           this.set('item', {});
           this.$.deleteButton.disabled = true;
           this.$.editButton.disabled = true;
-          return;
         }
 
-        // under construction
-        var index = grid.selectedItems[0];
-        console.log(index);
-        grid.get(index, function(err, item) {
-          this.set('item', Object.assign({}, item));
-          this.$.deleteButton.disabled = false;
-          this.$.editButton.disabled = false;
-        }.bind(this));
+        console.log(grid.selectedItems[0].task);
+
+        // Select for editing
+        this.$.task.value = grid.selectedItems[0].task;
+        this.$.start.value = grid.selectedItems[0].start;
+        this.$.end.value = grid.selectedItems[0].end;
+        this.$.rangeVal.value = grid.selectedItems[0].range;
+      },
+
+      // Function: Edit
+      handleEdit: function(){
+        grid.clearCache();
       },
 
       // Function: Clear
@@ -214,6 +213,9 @@
         }).then(deleteDocs => {
           return _db.bulkDocs(deleteDocs);
         });
+
+        grid.clearCache();
+
       },
 
       // Function: Delete
@@ -224,7 +226,8 @@
         // grid.selectedItems contains _id and _rev. No more selection.selected...
         _db.remove(grid.selectedItems[0]._id, grid.selectedItems[0]._rev);
 
-    
+        grid.clearCache();
+
 
       },
 
@@ -249,7 +252,7 @@
 
       },
 
-      // Function: Save (works)
+      // Function: Save
       handleSave: function() {
           this.$.end.value = (new Date).toTimeString().slice(0,8);
           var grid = this.$.grid;
@@ -271,6 +274,9 @@
           this.$.start.value = "";
           this.$.end.value = "";
           this.$.rangeVal.value = "";
+
+          // Supposed to refresh grid, but....
+          grid.clearCache();
 
       },
 
