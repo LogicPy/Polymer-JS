@@ -114,8 +114,7 @@
     <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{item.start}}"></paper-input>
     <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{item.end}}"></paper-input>
     <paper-input id="rangeVal" label="Range" value="{{item.range}}">Range</paper-input>
-    <paper-button raised on-tap="ClearClick">Clear</paper-button>
-    <paper-button raised on-tap="helpClick">About</paper-button>
+
   </div>
 
 </div>
@@ -181,12 +180,18 @@
             // If not selected, disable buttons
             this.$.deleteButton.disabled = false;
             this.$.editButton.disabled = false;
+            this.$.start.style.visibility='visible';
+            this.$.end.style.visibility='visible';
+            this.$.rangeVal.style.visibility='visible';
         }
         else
         {
             // Otherwise, enable
             this.$.deleteButton.disabled = true;
             this.$.editButton.disabled = true;
+            this.$.start.style.visibility='hidden';
+            this.$.end.style.visibility='hidden';
+            this.$.rangeVal.style.visibility='hidden';
         }
           try
           {
@@ -297,19 +302,6 @@
           location.reload();
 
       },
-
-    // Function: Clear Text Fields
-    ClearClick: function(){
-        this.$.task.value = "";
-        this.$.start.value = "";
-        this.$.end.value = "";
-        this.$.rangeVal.value = "";   
-    },
-
-    // Function: Help Button MessageBox
-    helpClick: function(){
-      alert("This is an updated version of Time Tracker that uses only Polymer 2.x web components including the most up-to-date version of Vaadin Grid (5.1.0).\n\n 1) Create tracker by clicking 'Start Recording'\n 2) Tracking will begin at your current time and end when you click 'Stop and Save'\n 3) Tracker details including start time, end time and duration between the two times will be logged and saved.\n\n Coded by Wayne")
-    },
 
     // Function: Calculate Range (Temporary)
     calcRange: function() {
