@@ -163,7 +163,7 @@
 
         // New row extraction routine
         _db.allDocs(options, function(error, response) {
-        // map new array rows
+        // map new array 'rows'
         var rows = response.rows.map(function(row) {
           return row.doc;
           });
@@ -236,7 +236,7 @@
       handleDelete: function() {
         var grid = this.$.grid;
         console.log(grid.selectedItems[0]);
-        // Figured it out!
+
         // grid.selectedItems contains _id and _rev. No more selection.selected...
         _db.remove(grid.selectedItems[0]._id, grid.selectedItems[0]._rev);
 
