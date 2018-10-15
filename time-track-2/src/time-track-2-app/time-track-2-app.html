@@ -179,8 +179,8 @@
 
         // Determine which item is selected in this construct
         if (grid.selectedItems.length > 0) {
-          this.$.deleteButton.disabled = false;
-          this.$.editButton.disabled = false;
+            this.$.deleteButton.disabled = false;
+            this.$.editButton.disabled = false;
         }
         else
         {
@@ -189,7 +189,6 @@
         }
           try
           {
-            this.set('item', {});
             this.$.task.value = grid.selectedItems[0].task;
             this.$.start.value = grid.selectedItems[0].start;
             this.$.end.value = grid.selectedItems[0].end;
