@@ -154,10 +154,10 @@
       // Function: On_Load
       ready: function() {
 
-        // Vaadin Grid + PouchDB
-
+        // Stop button disabled upon load to prevent blank submissions
         this.$.stopButton.disabled = true;
 
+        // Vaadin Grid + PouchDB
         var grid = this.$.grid;
 
         var options = {};
@@ -298,6 +298,7 @@
             console.log(err)
           });
       
+          // Save button re-enabled after pressing 'Stop'
           this.$.saveButton.disabled = false;
 
           // Reset Values
