@@ -32,6 +32,7 @@
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Electrolize" rel="stylesheet">
 
 <!-- Database Components -->
 <script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
@@ -68,6 +69,12 @@
       margin-left: auto;
       margin-right: auto;
       display: block;
+    }
+
+    .statusLabel
+    {
+      color: #778899;
+      font-family: 'Electrolize', sans-serif;
     }
 
     @media only screen and (max-width: 750px) {
@@ -156,6 +163,8 @@
 
         // Stop button disabled upon load to prevent blank submissions
         this.$.stopButton.disabled = true;
+        // Range is a computed value
+        this.$.rangeVal.style.visibility='hidden';
 
         // Vaadin Grid + PouchDB
         var grid = this.$.grid;
@@ -186,7 +195,6 @@
             this.$.editButton.disabled = false;
             this.$.start.style.visibility='visible';
             this.$.end.style.visibility='visible';
-            this.$.rangeVal.style.visibility='visible';
         }
         else
         {
@@ -195,7 +203,6 @@
             this.$.editButton.disabled = true;
             this.$.start.style.visibility='hidden';
             this.$.end.style.visibility='hidden';
-            this.$.rangeVal.style.visibility='hidden';
         }
           try
           {
