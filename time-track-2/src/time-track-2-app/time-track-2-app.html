@@ -184,18 +184,22 @@
         }
         else
         {
-          this.set('item', {});
-          this.$.deleteButton.disabled = true;
-          this.$.editButton.disabled = true;
+          try
+          {
+            this.set('item', {});
+            this.$.deleteButton.disabled = true;
+            this.$.editButton.disabled = true;
+            this.$.task.value = grid.selectedItems[0].task;
+            this.$.start.value = grid.selectedItems[0].start;
+            this.$.end.value = grid.selectedItems[0].end;
+            this.$.rangeVal.value = grid.selectedItems[0].range;
+          }
+          catch{
+            console.log("Error handled");
+          }
         }
 
-        console.log(grid.selectedItems[0].task);
 
-        // Select for editing
-        this.$.task.value = grid.selectedItems[0].task;
-        this.$.start.value = grid.selectedItems[0].start;
-        this.$.end.value = grid.selectedItems[0].end;
-        this.$.rangeVal.value = grid.selectedItems[0].range;
       },
 
       // Function: Edit
