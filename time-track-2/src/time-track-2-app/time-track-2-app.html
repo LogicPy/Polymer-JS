@@ -132,13 +132,14 @@
       is: 'time-track-2-app',
       properties: {
         _db: Object,
-        // Values
+        // Grid Items
         item: {
           type: Object,
           value: function() {
             return {};
           },
         },
+        // Active Grid Item / Selection
         activeItem: {
             observer: '_activeItemChanged'
           }
@@ -149,12 +150,10 @@
         _db = new PouchDB('times');
       },
 
-      _activeItemChanged: function(item) {
-        this.$.grid.selectedItems = item ? [item] : [];
-      },
-
       // Function: On_Load
       ready: function() {
+
+        // Vaadin Grid + PouchDB
 
         var grid = this.$.grid;
 
@@ -179,16 +178,19 @@
 
         // Determine which item is selected in this construct
         if (grid.selectedItems.length > 0) {
+            // If not selected, disable buttons
             this.$.deleteButton.disabled = false;
             this.$.editButton.disabled = false;
         }
         else
         {
+            // Otherwise, enable
             this.$.deleteButton.disabled = true;
             this.$.editButton.disabled = true;
         }
           try
           {
+            // Prepare for edit
             this.$.task.value = grid.selectedItems[0].task;
             this.$.start.value = grid.selectedItems[0].start;
             this.$.end.value = grid.selectedItems[0].end;
@@ -208,6 +210,7 @@
         grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
         return newDoc;
       });
+        // Temporary Grid Refresh Solution
         grid.clearCache();
         location.reload();
       },
@@ -223,6 +226,7 @@
           return _db.bulkDocs(deleteDocs);
         });
 
+        // Temporary Grid Refresh Solution
         grid.clearCache();
         location.reload();
 
@@ -236,6 +240,7 @@
         // grid.selectedItems contains _id and _rev. No more selection.selected...
         _db.remove(grid.selectedItems[0]._id, grid.selectedItems[0]._rev);
 
+        // Temporary Grid Refresh Solution
         grid.clearCache();
         location.reload();
 
@@ -257,6 +262,8 @@
         {
           // Textbox already occupied
         }
+
+        // Starting Time
         this.$.start.value = (new Date).toTimeString().slice(0,8);
 
       },
@@ -279,6 +286,7 @@
             console.log(err)
           });
       
+          // Reset Values
           this.$.task.value = "";
           this.$.start.value = "";
           this.$.end.value = "";
