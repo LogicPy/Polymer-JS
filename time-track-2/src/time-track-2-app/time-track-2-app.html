@@ -200,6 +200,12 @@
 
       // Function: Edit
       handleEdit: function(){
+        var grid = this.$.grid;
+        var newDoc = Object.assign({}, this.item);
+        _db.upsert(grid.selectedItems[0]._id, function(doc) {
+        grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
+        return newDoc;
+      });
         grid.clearCache();
       },
 
@@ -231,12 +237,10 @@
 
       },
 
-        _activeItemChanged: function(item) {
-          this.$.grid.selectedItems = item ? [item] : [];
-        },
-
-      // ----------------------------------------------
-      // ------------- Working Functions --------------
+      // Related to Item Selection (Recycled from documentation)
+      _activeItemChanged: function(item) {
+        this.$.grid.selectedItems = item ? [item] : [];
+      },
 
       // Function: Activate Tracker Application
       createTracker: function(){
