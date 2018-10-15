@@ -109,6 +109,8 @@
     <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
     <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
     <paper-button raised on-tap="handleSave" id="editButton" disabled>Edit</paper-button>
+    <paper-button raised on-tap="handleClear" id="clearButton">Clear</paper-button>
+
     <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{item.start}}"></paper-input>
     <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{item.end}}"></paper-input>
     <paper-input id="rangeVal" label="Range" value="{{item.range}}">Range</paper-input>
@@ -199,11 +201,24 @@
         }.bind(this));
       },
 
+      // Function: Clear
+      handleClear: function() {
+        var grid = this.$.grid;
+        _db.allDocs({include_docs: true}).then(allDocs => {
+        return allDocs.rows.map(row => {
+          return {_id: row.id, _rev: row.doc._rev, _deleted: true};
+        });
+        }).then(deleteDocs => {
+          return _db.bulkDocs(deleteDocs);
+        });
+      },
+
       // Function: Delete
       handleDelete: function() {
         var grid = this.$.grid;
         _db.remove(this.item._id, this.item._rev).then(function(doc) {
           grid.item.clear();
+
         }).then(function(doc) {
           // update Grid
           grid.clearCache();
