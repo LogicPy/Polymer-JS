@@ -207,6 +207,7 @@
         return newDoc;
       });
         grid.clearCache();
+        location.reload();
       },
 
       // Function: Clear
@@ -221,6 +222,7 @@
         });
 
         grid.clearCache();
+        location.reload();
 
       },
 
@@ -233,6 +235,7 @@
         _db.remove(grid.selectedItems[0]._id, grid.selectedItems[0]._rev);
 
         grid.clearCache();
+        location.reload();
 
 
       },
@@ -281,6 +284,7 @@
 
           // Supposed to refresh grid, but....
           grid.clearCache();
+          location.reload();
 
       },
 
