@@ -106,10 +106,12 @@
   <div class="form_Objects">
     <paper-input type="text" id="task" label="Tracker Name" value="{{item.task}}"></paper-input>
     <paper-button raised on-tap="createTracker" id="saveButton">Start Recording</paper-button>
-    <paper-button raised on-tap="handleSave" id="saveButton">Stop and Save</paper-button>
+    <paper-button raised on-tap="handleSave" id="stopButton">Stop and Save</paper-button>
     <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
     <paper-button raised on-tap="handleEdit" id="editButton" disabled>Edit</paper-button>
     <paper-button raised on-tap="handleClear" id="clearButton">Clear</paper-button>
+
+    <br><br><label class="statusLabel" id="statuslbl">Press 'Start Recording' to begin</label>
 
     <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{item.start}}"></paper-input>
     <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{item.end}}"></paper-input>
@@ -270,6 +272,8 @@
 
         // Starting Time
         this.$.start.value = (new Date).toTimeString().slice(0,8);
+        this.$.saveButton.disabled = true;
+        this.$.statuslbl.innerHTML = "Recording Tracker - Press 'Stop and Save' to stop recording";
 
       },
 
@@ -291,6 +295,8 @@
             console.log(err)
           });
       
+          this.$.saveButton.disabled = false;
+
           // Reset Values
           this.$.task.value = "";
           this.$.start.value = "";
