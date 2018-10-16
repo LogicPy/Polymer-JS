@@ -111,7 +111,7 @@
   </vaadin-grid>
 
   <div class="form_Objects">
-    <paper-input type="text" id="task" label="Tracker Name" value="{{item.task}}"></paper-input>
+    <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}"></paper-input>
     <paper-button raised on-tap="createTracker" id="saveButton">Start Recording</paper-button>
     <paper-button raised on-tap="handleSave" id="stopButton">Stop and Save</paper-button>
     <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
@@ -120,9 +120,9 @@
 
     <br><br><label class="statusLabel" id="statuslbl">Press 'Start Recording' to begin</label>
 
-    <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{item.start}}"></paper-input>
-    <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{item.end}}"></paper-input>
-    <paper-input id="rangeVal" label="Range" value="{{item.range}}">Range</paper-input>
+    <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeKey.start}}"></paper-input>
+    <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeKey.end}}"></paper-input>
+    <paper-input id="rangeVal" label="Range" value="{{timeKey.range}}">Range</paper-input>
 
   </div>
 
@@ -141,7 +141,7 @@
       properties: {
         _db: Object,
         // Grid Items
-        item: {
+        timeKey: {
           type: Object,
           value: function() {
             return {};
@@ -176,11 +176,11 @@
         // New row extraction routine
         _db.allDocs(options, function(error, response) {
         // map new array 'rows'
-        var rows = response.rows.map(function(row) {
+        this.timeKey = response.rows.map(function(row) {
           return row.doc;
           });
           // Append local db rows to Vaadin grid
-          grid.items = rows;
+          grid.items = this.timeKey;
       })
     },
 
@@ -221,7 +221,7 @@
       // Function: Edit
       handleEdit: function(){
         var grid = this.$.grid;
-        var newDoc = Object.assign({}, this.item);
+        var newDoc = Object.assign({}, this.timeKey);
         _db.upsert(grid.selectedItems[0]._id, function(doc) {
         grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
         return newDoc;
@@ -291,7 +291,7 @@
       handleSave: function() {
           this.$.end.value = (new Date).toTimeString().slice(0,8);
           var grid = this.$.grid;
-          var newDoc = Object.assign({}, this.item);
+          var newDoc = Object.assign({}, this.timeKey);
           if (!newDoc.hasOwnProperty('_id')) {
             newDoc._id = new Date().toISOString();
           }
