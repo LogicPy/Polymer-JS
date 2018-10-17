@@ -92,8 +92,10 @@
     }
     </style>
 
-  <h2 class="App_Title">Time Tracker 2</h2>
+<!-- App Title -->
+<h2 class="App_Title">Time Tracker 2</h2>
 
+<!-- Form Container -->
 <div class="form_Whole">
 
   <!-- Grid Space -->
@@ -117,11 +119,14 @@
     </vaadin-grid-column>
   </vaadin-grid>
 
+  <!-- Time Conversions -->
   <input id="msStart" value$="{{StartSeconds}}"><br>
   <input id="msEnd" value$="{{EndSeconds}}"><br>
 
+  <!-- Time-Diff Component -->
   <time-diff id="diff"></time-diff>
 
+  <!-- Form UI -->
   <div class="form_Objects">
     <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}" value$="{{taskValue}}"></paper-input>
     <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtn }}">Start Recording</paper-button>
@@ -140,9 +145,14 @@
 
 </div>
 
+<!-- Footer -->
+<div class="footer">
+  <p>Time Tracker 2 / 2018</p>
+</div>
+
 </template>
 
-  <script>
+<script>
 
     Polymer({
       is: 'time-track-2-app',
@@ -166,22 +176,19 @@
       // Function: Database Definition
       created: function() {
         _db = new PouchDB('times');
-
       },
 
       // Function: On_Load
       ready: function() {
+        var grid = this.$.grid;
+        var options = {};
+
         // Stop button disabled upon load to prevent blank submissions
         this.stopBtn = true;
-        // Range is a computed value
+        // Range is a computed value / Remains hidden
         this.rangeVisibility = 'hidden';
         // Instructions for activation
         this.statusOutput = "Press 'Start Recording' to begin";
-
-        // Vaadin Grid + PouchDB
-        var grid = this.$.grid;
-
-        var options = {};
 
         options.include_docs = true;
 
@@ -247,6 +254,7 @@
       // Function: Clear
       handleClear: function() {
         var grid = this.$.grid;
+
         _db.allDocs({include_docs: true}).then(allDocs => {
         return allDocs.rows.map(row => {
           return {_id: row.id, _rev: row.doc._rev, _deleted: true};
@@ -349,7 +357,8 @@
     calcRange: function() {
       var smon = this.startValue;
       var fmon = this.endValue;
-        var diff = 0 ;
+      var diff = 0 ;
+
         if (smon && fmon) {
           smon = ConvertToSeconds(smon);
           fmon = ConvertToSeconds(fmon);
@@ -387,5 +396,6 @@
   });
 
 
-  </script>
+</script>
+
 </dom-module>
