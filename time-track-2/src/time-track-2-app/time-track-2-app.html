@@ -112,16 +112,16 @@
 
   <div class="form_Objects">
     <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}"></paper-input>
-    <paper-button raised on-tap="createTracker" id="saveButton">Start Recording</paper-button>
-    <paper-button raised on-tap="handleSave" id="stopButton">Stop and Save</paper-button>
-    <paper-button raised on-tap="handleDelete" id="deleteButton" disabled>Delete</paper-button>
-    <paper-button raised on-tap="handleEdit" id="editButton" disabled>Edit</paper-button>
+    <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtn }}">Start Recording</paper-button>
+    <paper-button raised on-tap="handleSave" id="stopButton" disabled$="{{ stopBtn }}">Stop and Save</paper-button>
+    <paper-button raised on-tap="handleDelete" id="deleteButton" disabled$="{{ DelBtn }}">Delete</paper-button>
+    <paper-button raised on-tap="handleEdit" id="editButton" disabled$="{{ EditBtn }}">Edit</paper-button>
     <paper-button raised on-tap="handleClear" id="clearButton">Clear</paper-button>
 
     <br><br><label class="statusLabel" id="statuslbl">Press 'Start Recording' to begin</label>
 
-    <paper-input type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeKey.start}}"></paper-input>
-    <paper-input type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeKey.end}}"></paper-input>
+    <paper-input style$="visibility: {{startVisibility}};" type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeKey.start}}"></paper-input>
+    <paper-input style$="visibility: {{endVisibility}};" type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeKey.end}}"></paper-input>
     <paper-input id="rangeVal" label="Range" value="{{timeKey.range}}">Range</paper-input>
 
   </div>
@@ -140,6 +140,7 @@
       is: 'time-track-2-app',
       properties: {
         _db: Object,
+        grid1: Object,
         // Grid Items
         timeKey: {
           type: Object,
@@ -156,13 +157,14 @@
       // Function: Database Definition
       created: function() {
         _db = new PouchDB('times');
+
       },
 
       // Function: On_Load
       ready: function() {
 
         // Stop button disabled upon load to prevent blank submissions
-        this.$.stopButton.disabled = true;
+        this.stopBtn = true;
         // Range is a computed value
         this.$.rangeVal.style.visibility='hidden';
 
@@ -191,18 +193,20 @@
         // Determine which item is selected in this construct
         if (grid.selectedItems.length > 0) {
             // If not selected, disable buttons
-            this.$.deleteButton.disabled = false;
-            this.$.editButton.disabled = false;
-            this.$.start.style.visibility='visible';
-            this.$.end.style.visibility='visible';
+            this.DelBtn = false;
+            this.EditBtn = false;
+            
+            this.startVisibility = 'visible';
+            this.endVisibility = 'visible';
+            
         }
         else
         {
             // Otherwise, enable
-            this.$.deleteButton.disabled = true;
-            this.$.editButton.disabled = true;
-            this.$.start.style.visibility='hidden';
-            this.$.end.style.visibility='hidden';
+            this.DelBtn = true;
+            this.EditBtn = true;
+            this.startVisibility = 'hidden';
+            this.endVisibility = 'hidden';
         }
           try
           {
@@ -281,8 +285,8 @@
 
         // Starting Time
         this.$.start.value = (new Date).toTimeString().slice(0,8);
-        this.$.saveButton.disabled = true;
-        this.$.stopButton.disabled = false;
+        this.saveBtn = true;
+        this.stopBtn = false;
         this.$.statuslbl.innerHTML = "Recording Tracker - Press 'Stop and Save' to stop recording";
 
       },
@@ -306,7 +310,7 @@
           });
       
           // Save button re-enabled after pressing 'Stop'
-          this.$.saveButton.disabled = false;
+          this.saveBtn = false;
 
           // Reset Values
           this.$.task.value = "";
