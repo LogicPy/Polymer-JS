@@ -41,7 +41,8 @@
 <dom-module id="time-track-2-app">
   <template>
     <style>
-      :host {
+      :host 
+      {
         display: block;
       }
       .App_Title
@@ -50,7 +51,8 @@
         font-size: 40px;
         margin-left: 20px;
       }
-    .footer {
+      .footer 
+      {
         position: fixed;
         left: 0;
         bottom: 0;
@@ -61,28 +63,28 @@
         border-top-width: 1px;
         border-top-style: solid;
         font-family: 'K2D', sans-serif;
-    }
+      }
 
-    .form_Whole
-    {
-      width:80%;
-      margin-left: auto;
-      margin-right: auto;
-      display: block;
-    }
+      .form_Whole
+      {
+        width:80%;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
 
-    .statusLabel
-    {
-      color: #778899;
-      font-family: 'Electrolize', sans-serif;
-    }
+      .statusLabel
+      {
+        color: #778899;
+        font-family: 'Electrolize', sans-serif;
+      }
 
-    #msStart, #msEnd
-    {
-      display: none;
-    }
+      #msStart, #msEnd
+      {
+        display: none;
+      }
 
-    @media only screen and (max-width: 750px) {
+      @media only screen and (max-width: 750px) {
       .form_Whole
       {
         width: 100%;
@@ -115,8 +117,8 @@
     </vaadin-grid-column>
   </vaadin-grid>
 
-  <input id="msStart"><br>
-  <input id="msEnd"><br>
+  <input id="msStart" value$="{{StartSeconds}}"><br>
+  <input id="msEnd" value$="{{EndSeconds}}"><br>
 
   <time-diff id="diff"></time-diff>
 
@@ -169,7 +171,6 @@
 
       // Function: On_Load
       ready: function() {
-
         // Stop button disabled upon load to prevent blank submissions
         this.stopBtn = true;
         // Range is a computed value
@@ -262,7 +263,6 @@
       // Function: Delete
       handleDelete: function() {
         var grid = this.$.grid;
-        console.log(grid.selectedItems[0]);
 
         // grid.selectedItems contains _id and _rev. No more selection.selected...
         _db.remove(grid.selectedItems[0]._id, grid.selectedItems[0]._rev);
@@ -288,7 +288,7 @@
           // Textbox already occupied
         }
 
-        this.$.msStart.value = Date.now();
+        this.StartSeconds = Date.now();
 
         // Starting Time
         this.startValue = (new Date).toTimeString().slice(0,8);
@@ -300,16 +300,15 @@
 
       // Function: Save
       handleSave: function() {
-
           var diff = this.$.diff;
           var min = 0;
           var max = 10000;
 
           this.endValue = (new Date).toTimeString().slice(0,8);
-          this.$.msEnd.value = Date.now();
+          this.EndSeconds = Date.now();
 
-          diff.from = this.$.msStart.value;
-          diff.to = this.$.msEnd.value;
+          diff.from = this.StartSeconds;
+          diff.to = this.EndSeconds;
 
           diff.minUnit = min.value;
           diff.maxUnit = max.value;
@@ -372,13 +371,12 @@
 
     // Function: New Range Calculator using Time-Diff Component
     calcRange2: function() {
-
       var diff = this.$.diff;
       var min = 0;
       var max = 10000;
 
-      diff.from = this.$.msStart.value;
-      diff.to = this.$.msEnd.value;
+      diff.from = this.StartSeconds;
+      diff.to = this.EndSeconds;
 
       diff.minUnit = min.value;
       diff.maxUnit = max.value;
