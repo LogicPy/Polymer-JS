@@ -3,74 +3,73 @@
 <dom-module id="ui-loader">
   <template>
     <style>
-      :host {
-        display: block;
-      }
 
-      .statusLabel
-      {
-        color: #778899;
-        font-family: 'Electrolize', sans-serif;
-      }
+    :host {
+      display: block;
+    }
 
-      #msStart, #msEnd
-      {
-        display: none;
-      }
+    .statusLabel
+    {
+      color: #778899;
+      font-family: 'Electrolize', sans-serif;
+    }
 
-      .hideMe
-      {
-        display: none;
-      }
+    #msStart, #msEnd
+    {
+      display: none;
+    }
+
+    .hideMe
+    {
+      display: none;
+    }
 
     </style>
 
-  <!-- Grid Space -->
-  <vaadin-grid id="grid" on-selected-items-changed="handleSelect" active-item="{{activeItem}}" items=[[timeKey]]>
+    <!-- Grid Space -->
+    <vaadin-grid id="grid" on-selected-items-changed="handleSelect" active-item="{{activeItem}}" items=[[timeKey]]>
+      <vaadin-grid-column>
+        <template class="header">Task</template>
+        <template>[[item.task]]</template>
+      </vaadin-grid-column>
+      <vaadin-grid-column>
+        <template class="header">Start</template>
+        <template>[[item.start]]</template>
+      </vaadin-grid-column>
+      <vaadin-grid-column>
+        <template class="header">End</template>
+        <template>[[item.end]]</template>
+      </vaadin-grid-column>
+      <vaadin-grid-column>
+        <template class="header">Range</template>
+        <template>[[item.range]]</template>
+      </vaadin-grid-column>
+    </vaadin-grid>
 
-    <vaadin-grid-column>
-      <template class="header">Task</template>
-      <template>[[item.task]]</template>
-    </vaadin-grid-column>
-    <vaadin-grid-column>
-      <template class="header">Start</template>
-      <template>[[item.start]]</template>
-    </vaadin-grid-column>
-    <vaadin-grid-column>
-      <template class="header">End</template>
-      <template>[[item.end]]</template>
-    </vaadin-grid-column>
-    <vaadin-grid-column>
-      <template class="header">Range</template>
-      <template>[[item.range]]</template>
-    </vaadin-grid-column>
-  </vaadin-grid>
+    <!-- Time Conversions -->
+    <input id="msStart" value$="{{StartSeconds}}"><br>
+    <input id="msEnd" value$="{{EndSeconds}}"><br>
 
-  <!-- Time Conversions -->
-  <input id="msStart" value$="{{StartSeconds}}"><br>
-  <input id="msEnd" value$="{{EndSeconds}}"><br>
+    <!-- Time-Diff Component -->
+    <div class="hideMe">
+      <time-diff id="diff"></time-diff>
+    </div>
 
-  <!-- Time-Diff Component -->
-  <div class="hideMe">
-    <time-diff id="diff"></time-diff>
-  </div>
+    <!-- Form UI -->
+    <div class="form_Objects">
+      <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}" value$="{{taskValue}}"></paper-input>
+      <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtnEnabled }}">Start Recording</paper-button>
+      <paper-button raised on-tap="handleSave" id="stopButton" disabled$="{{ stopBtnEnabled }}">Stop and Save</paper-button>
+      <paper-button raised on-tap="handleDelete" id="deleteButton" disabled$="{{ DelBtnEnable }}">Delete</paper-button>
+      <paper-button raised on-tap="handleEdit" id="editButton" disabled$="{{ EditBtnEnable }}">Edit</paper-button>
+      <paper-button raised on-tap="handleClear" id="clearButton">Clear</paper-button>
 
-  <!-- Form UI -->
-  <div class="form_Objects">
-    <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}" value$="{{taskValue}}"></paper-input>
-    <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtnEnabled }}">Start Recording</paper-button>
-    <paper-button raised on-tap="handleSave" id="stopButton" disabled$="{{ stopBtnEnabled }}">Stop and Save</paper-button>
-    <paper-button raised on-tap="handleDelete" id="deleteButton" disabled$="{{ DelBtnEnable }}">Delete</paper-button>
-    <paper-button raised on-tap="handleEdit" id="editButton" disabled$="{{ EditBtnEnable }}">Edit</paper-button>
-    <paper-button raised on-tap="handleClear" id="clearButton">Clear</paper-button>
+      <br><br><label class="statusLabel" id="statuslbl">{{statusOutput}}</label>
 
-    <br><br><label class="statusLabel" id="statuslbl">{{statusOutput}}</label>
-
-    <paper-input style$="visibility: {{startVisibility}};" type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeKey.start}}" value$="{{startValue}}"></paper-input>
-    <paper-input style$="visibility: {{endVisibility}};" type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeKey.end}}" value$="{{endValue}}"></paper-input>
-    <paper-input id="rangeVal" label="Range" value="{{timeKey.range}}" value$="{{rangeValue}}" style$="visibility: {{rangeVisibility}};">Range</paper-input>
-
-  </div>
+      <paper-input style$="visibility: {{startVisibility}};" type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeKey.start}}" value$="{{startValue}}"></paper-input>
+      <paper-input style$="visibility: {{endVisibility}};" type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeKey.end}}" value$="{{endValue}}"></paper-input>
+      <paper-input id="rangeVal" label="Range" value="{{timeKey.range}}" value$="{{rangeValue}}" style$="visibility: {{rangeVisibility}};">Range</paper-input>  
+    </div>
 
   </template>
 
@@ -115,11 +114,10 @@
           type: Object,
           value: function() {
             return {};
-          },
         },
-
-        };
-      }
+        },
+      };
+    }
 
       ready() {
         super.ready();
@@ -143,7 +141,7 @@
         grid.items = response.rows.map(function(row) {
           return row.doc;
           });
-      })
+        })
       }
 
       // Function: Selection
@@ -177,9 +175,9 @@
             this.rangeValue = this.gridSelected.range;
           }
           catch{
-
+            console.log("De-selected");
           }
-      }
+        }
 
       // Function: Delete
       handleDelete() {
@@ -204,7 +202,7 @@
         _db.upsert(this.gridSelected._id, function(doc) {
         grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
         return newDoc;
-      });
+        });
         // Temporary Grid Refresh Solution
         grid.clearCache();
         location.reload();
@@ -228,6 +226,7 @@
       createTracker(){
         if(this.$.task.value == "")
         {
+          // Default Tracker Value if input field is empty
           this.taskValue = "Tracker";
         }
         else
@@ -235,9 +234,10 @@
           // Textbox already occupied
         }
 
+        // Start Time in Seconds
         this.StartSeconds = Date.now();
 
-        // Starting Time
+        // Starting Time in Standard Format
         this.startValue = (new Date).toTimeString().slice(0,8);
         this.saveBtnEnabled = true;
         this.stopBtnEnabled = false;
@@ -290,45 +290,45 @@
         location.reload();
       }
 
-    // Function: Calculate Range (Primitive)
-    calcRange() {
-      var smon = this.startValue;
-      var fmon = this.endValue;
-      var diff = 0 ;
+      // Function: Calculate Range (Primitive)
+      calcRange() {
+        var smon = this.startValue;
+        var fmon = this.endValue;
+        var diff = 0 ;
 
-        if (smon && fmon) {
-          smon = ConvertToSeconds(smon);
-          fmon = ConvertToSeconds(fmon);
-          diff = Math.abs( fmon - smon );
-          this.rangeValue = secondsTohhmmss(diff);
-        }
-        function ConvertToSeconds(time) {
-          var splitTime = time.split(":");
-          return splitTime[0] * 3600 + splitTime[1] * 60;
-        }
-        function secondsTohhmmss(secs) {
-          var hours = parseInt(secs / 3600);
-          var seconds = parseInt(secs % 3600);
-          var minutes = parseInt(seconds / 60) ;
-          return seconds + " seconds ";
+          if (smon && fmon) {
+            smon = ConvertToSeconds(smon);
+            fmon = ConvertToSeconds(fmon);
+            diff = Math.abs( fmon - smon );
+            this.rangeValue = secondsTohhmmss(diff);
+          }
+          function ConvertToSeconds(time) {
+            var splitTime = time.split(":");
+            return splitTime[0] * 3600 + splitTime[1] * 60;
+          }
+          function secondsTohhmmss(secs) {
+            var hours = parseInt(secs / 3600);
+            var seconds = parseInt(secs % 3600);
+            var minutes = parseInt(seconds / 60) ;
+            return seconds + " seconds ";
         } 
-    }
+      }
 
-    // Function: New Range Calculator using Time-Diff Component
-    calcRange2() {
-      var diff = this.$.diff;
-      var min = 0;
-      var max = 10000;
+      // Function: New Range Calculator using Time-Diff Component
+      calcRange2() {
+        var diff = this.$.diff;
+        var min = 0;
+        var max = 10000;
 
-      diff.from = this.StartSeconds;
-      diff.to = this.EndSeconds;
+        diff.from = this.StartSeconds;
+        diff.to = this.EndSeconds;
 
-      diff.minUnit = min.value;
-      diff.maxUnit = max.value;
+        diff.minUnit = min.value;
+        diff.maxUnit = max.value;
 
-      this.rangeValue = diff.diff;
-    }
-  }
+        this.rangeValue = diff.diff;
+        }
+      }
 
     window.customElements.define(uiloader.is, uiloader);
 
