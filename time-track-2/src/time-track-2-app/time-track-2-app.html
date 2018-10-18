@@ -137,8 +137,8 @@
 
     <br><br><label class="statusLabel" id="statuslbl">{{statusOutput}}</label>
 
-    <paper-input style$="visibility: {{startVisibility}};" type="time" id="start" label="Start" on-value-changed="calcRange2" value="{{timeKey.start}}" value$="{{startValue}}"></paper-input>
-    <paper-input style$="visibility: {{endVisibility}};" type="time" id="end" label="End" on-value-changed="calcRange2" value="{{timeKey.end}}" value$="{{endValue}}"></paper-input>
+    <paper-input style$="visibility: {{startVisibility}};" type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeKey.start}}" value$="{{startValue}}"></paper-input>
+    <paper-input style$="visibility: {{endVisibility}};" type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeKey.end}}" value$="{{endValue}}"></paper-input>
     <paper-input id="rangeVal" label="Range" value="{{timeKey.range}}" value$="{{rangeValue}}" style$="visibility: {{rangeVisibility}};">Range</paper-input>
 
   </div>
@@ -373,7 +373,7 @@
           var hours = parseInt(secs / 3600);
           var seconds = parseInt(secs % 3600);
           var minutes = parseInt(seconds / 60) ;
-          return hours + "hours : " + minutes + "minutes ";
+          return seconds + " seconds ";
         } 
     },
 
