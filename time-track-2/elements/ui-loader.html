@@ -1,6 +1,6 @@
-<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
 
-<dom-module id="db-loader">
+<dom-module id="ui-loader">
   <template>
     <style>
       :host {
@@ -58,10 +58,10 @@
   <!-- Form UI -->
   <div class="form_Objects">
     <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}" value$="{{taskValue}}"></paper-input>
-    <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtn }}">Start Recording</paper-button>
-    <paper-button raised on-tap="handleSave" id="stopButton" disabled$="{{ stopBtn }}">Stop and Save</paper-button>
-    <paper-button raised on-tap="handleDelete" id="deleteButton" disabled$="{{ DelBtn }}">Delete</paper-button>
-    <paper-button raised on-tap="handleEdit" id="editButton" disabled$="{{ EditBtn }}">Edit</paper-button>
+    <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtnEnabled }}">Start Recording</paper-button>
+    <paper-button raised on-tap="handleSave" id="stopButton" disabled$="{{ stopBtnEnabled }}">Stop and Save</paper-button>
+    <paper-button raised on-tap="handleDelete" id="deleteButton" disabled$="{{ DelBtnEnable }}">Delete</paper-button>
+    <paper-button raised on-tap="handleEdit" id="editButton" disabled$="{{ EditBtnEnable }}">Edit</paper-button>
     <paper-button raised on-tap="handleClear" id="clearButton">Clear</paper-button>
 
     <br><br><label class="statusLabel" id="statuslbl">{{statusOutput}}</label>
@@ -76,8 +76,8 @@
 
   <script>
 
-    class DbLoader extends Polymer.Element {
-      static get is() { return 'db-loader'; }
+    class uiloader extends Polymer.Element {
+      static get is() { return 'ui-loader'; }
       static get properties() {
         return {
 
@@ -86,7 +86,31 @@
             observer: '_activeItemChanged'
           },
 
+        // Grid Item Length
+        gridLength: {
+          type: Object,
+          value: function() {
+            return {};
+          },
+        },
+
+        // Selected Grid Items
+        gridSelected: {
+          type: Object,
+          value: function() {
+            return {};
+          },
+        },
+
         // Grid Items
+        gridItem: {
+          type: Object,
+          value: function() {
+            return {};
+          },
+        },
+
+        // DB Items
         timeKey: {
           type: Object,
           value: function() {
@@ -101,10 +125,11 @@
         super.ready();
 
         var grid = this.$.grid;
+
         var options = {};
 
         // Stop button disabled upon load to prevent blank submissions
-        this.stopBtn = true;
+        this.stopBtnEnabled = true;
         // Range is a computed value / Remains hidden
         this.rangeVisibility = 'hidden';
         // Instructions for activation
@@ -123,31 +148,33 @@
 
       // Function: Selection
       handleSelect(e) {
-        var grid = this.$.grid;
+        this.gridLength = this.$.grid.selectedItems.length;
+        this.gridSelected = this.$.grid.selectedItems[0];
+        this.gridItem = this.$.grid;
 
         // Determine which item is selected in this construct
-        if (grid.selectedItems.length > 0) {
+        if (this.gridLength > 0) {
             // If not selected, disable buttons
-            this.DelBtn = false;
-            this.EditBtn = false;     
+            this.DelBtnEnable = false;
+            this.EditBtnEnable = false;     
             this.startVisibility = 'visible';
             this.endVisibility = 'visible';
         }
         else
         {
             // Otherwise, enable
-            this.DelBtn = true;
-            this.EditBtn = true;
+            this.DelBtnEnable = true;
+            this.EditBtnEnable = true;
             this.startVisibility = 'hidden';
             this.endVisibility = 'hidden';
         }
           try
           {
             // Prepare for edit
-            this.taskValue = grid.selectedItems[0].task;
-            this.startValue = grid.selectedItems[0].start;
-            this.endValue = grid.selectedItems[0].end;
-            this.rangeValue = grid.selectedItems[0].range;
+            this.taskValue = this.gridSelected.task;
+            this.startValue = this.gridSelected.start;
+            this.endValue = this.gridSelected.end;
+            this.rangeValue = this.gridSelected.range;
           }
           catch{
 
@@ -156,20 +183,17 @@
 
       // Function: Delete
       handleDelete() {
-        var grid = this.$.grid;
-
         // grid.selectedItems contains _id and _rev. No more selection.selected...
-        _db.remove(grid.selectedItems[0]._id, grid.selectedItems[0]._rev);
+        _db.remove(this.gridSelected._id, this.gridSelected._rev);
 
         // Temporary Grid Refresh Solution
-        grid.clearCache();
         location.reload();
       }
 
       // Related to Item Selection (Recycled from documentation)
       _activeItemChanged(item) {
-        this.$.grid.selectedItems = item ? [item] : [];
-        return this.$.grid.selectedItems;
+        this.gridItem.selectedItems = item ? [item] : [];
+        return this.gridItem.selectedItems;
       }
 
       // Function: Edit
@@ -177,7 +201,7 @@
         var grid = this.$.grid;
 
         var newDoc = Object.assign({}, this.timeKey);
-        _db.upsert(grid.selectedItems[0]._id, function(doc) {
+        _db.upsert(this.gridSelected._id, function(doc) {
         grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
         return newDoc;
       });
@@ -188,8 +212,6 @@
 
       // Function: Clear
       handleClear() {
-        var grid = this.$.grid;
-
         _db.allDocs({include_docs: true}).then(allDocs => {
         return allDocs.rows.map(row => {
           return {_id: row.id, _rev: row.doc._rev, _deleted: true};
@@ -199,7 +221,6 @@
         });
 
         // Temporary Grid Refresh Solution
-        grid.clearCache();
         location.reload();
       }
 
@@ -218,8 +239,8 @@
 
         // Starting Time
         this.startValue = (new Date).toTimeString().slice(0,8);
-        this.saveBtn = true;
-        this.stopBtn = false;
+        this.saveBtnEnabled = true;
+        this.stopBtnEnabled = false;
         this.statusOutput = "Recording Tracker - Press 'Stop and Save' to stop recording";
       }
 
@@ -256,7 +277,7 @@
         });
     
         // Save button re-enabled after pressing 'Stop'
-        this.saveBtn = false;
+        this.saveBtnEnabled = false;
 
         // Reset Values
         this.taskValue = "";
@@ -309,7 +330,7 @@
     }
   }
 
-    window.customElements.define(DbLoader.is, DbLoader);
+    window.customElements.define(uiloader.is, uiloader);
 
   </script>
 </dom-module>
