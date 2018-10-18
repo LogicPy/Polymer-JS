@@ -7,23 +7,17 @@
     :host {
       display: block;
     }
-
-    .statusLabel
-    {
+    .statusLabel {
       color: #778899;
       font-family: 'Electrolize', sans-serif;
     }
-
-    #msStart, #msEnd
-    {
+    #msStart, #msEnd {
       display: none;
     }
-
-    .hideMe
-    {
+    .hideMe {
       display: none;
     }
-
+    
     </style>
 
     <!-- Grid Space -->
@@ -80,41 +74,32 @@
       static get properties() {
         return {
 
-        // Active Grid Item / Selection
-        activeItem: {
-            observer: '_activeItemChanged'
-          },
-
-        // Grid Item Length
         gridLength: {
-          type: Object,
+          type: Number,
           value: function() {
             return {};
           },
         },
-
-        // Selected Grid Items
         gridSelected: {
           type: Object,
           value: function() {
             return {};
           },
         },
-
-        // Grid Items
         gridItem: {
           type: Object,
           value: function() {
             return {};
           },
         },
-
-        // DB Items
         timeKey: {
           type: Object,
           value: function() {
             return {};
         },
+        },
+        activeItem: {
+          observer: '_activeItemChanged'
         },
       };
     }
