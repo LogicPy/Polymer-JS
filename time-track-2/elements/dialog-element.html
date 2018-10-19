@@ -12,17 +12,39 @@
         position: relative;
         float: right;
       }
+      .btnContainer {
+        text-align: center;
+      }
 
     </style>
 
 <paper-button raised on-tap="dialogDisplay" id="clearButton">About</paper-button>
 
-<vaadin-dialog id="diatest">
+<vaadin-dialog id="aboutMsg" opened="{{opened}}">
   <template>
     <div>
 
     <h4>[[title]]</h4>
     <p>[[message]]</p>
+    <div class="btnContainer">
+      <vaadin-button on-click="okClick" theme="raised tertiary" >[[okTxt]]</vaadin-button>
+    </div>
+
+    </div>
+  </template>
+</vaadin-dialog>
+
+<vaadin-dialog id="confirmDialog">
+  <template>
+    <div>
+
+    <h4>[[title]]</h4>
+    <p>[[deleteMsg]]</p>
+
+  <div class="btnContainer">
+    <vaadin-button on-click="okClick" theme="raised tertiary" >[[okTxt]]</vaadin-button>
+    <vaadin-button on-click="cancelClick" theme="raised tertiary error">class="right">[[cancelTxt]]</vaadin-button>
+  </div>
 
     </div>
   </template>
@@ -51,18 +73,38 @@
               type: String,
               value: 'Time Tracking tool for logging and organizing daily tasks.'
             },
+            deleteMsg: {
+              type: String,
+              value: 'Are you sure you want to delete this entry?'
+            },
+            clearMsg: {
+              type: String,
+              value: 'Are you sure you want to delete all entries?'
+            },
+            okTxt: {
+              type: String,
+              value: 'OK'
+            },     
+            cancelTxt: {
+              type: String,
+              value: 'Cancel'
+            },
         };
       }
 
-      return() {
-        this.super();
-      }
-
       dialogDisplay() {
-        this.$.diatest.opened = true;
+        this.$.aboutMsg.opened = true;
       }
 
-    }
+      cancelClick() {
+        this.$.aboutMsg.opened = false;
+      }
+
+      okClick() {
+        // Event will go here
+        this.$.aboutMsg.opened = false;
+      }
+  }
 
     window.customElements.define(DialogElement.is, DialogElement);
   </script>
