@@ -180,22 +180,18 @@
         return this.gridItem.selectedItems;
       }
 
-      // Function: Edit
+      // Function: Edit [Re-calculate Time Differences]
       handleEdit(){
         var diff = this.$.diff;
-        var min = 0;
-        var max = 100000;
-
         var grid = this.$.grid;
-
         var stime = this.startValue;
         var ftime = this.endValue;
-
         var splitS = stime.split(":");
         var splitF = ftime.split(":");
-
         var std = (splitS[1] * 1000) + (splitS[0] * 60000);
         var etd = (splitF[1] * 1000) + (splitF[0] * 60000);
+        var min = 0;
+        var max = 100000;
 
         this.StartSeconds = std;
         this.EndSeconds = etd;
