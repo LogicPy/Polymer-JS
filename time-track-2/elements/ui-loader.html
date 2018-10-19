@@ -1,4 +1,37 @@
+
+<!-- Time Tracker v2 / Polymer Project-->
+<!-- ui-loader Element -->
+<!-- Wayne Kenney / 2018 -->
+
+<!-- Polymer -->
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<!-- Paper Style Components -->
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<!-- Vaadin Grid -->
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column-group.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-filter.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-tree-toggle.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
+<link rel="import" href="../../bower_components/vaadin-dialog/vaadin-dialog.html">
+
+<!-- Misc Components -->
+<link rel="import" href="../../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/datetime-picker/datetime-picker.html">
+<link rel="import" href="../../bower_components/time-diff/time-diff.html">
+
+<!-- Database Components -->
+<script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
+<script src="../../bower_components/pouchdb-upsert/dist/pouchdb.upsert.js"></script>
+
+<!-- Iron Ajax -->
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="ui-loader">
   <template>
@@ -21,7 +54,7 @@
     </style>
 
     <!-- Grid Space -->
-    <vaadin-grid id="grid" on-selected-items-changed="handleSelect" active-item="{{activeItem}}" items=[[timeKey]]>
+    <vaadin-grid id="grid" on-selected-items-changed="handleSelect" active-item="{{activeItem}}" items="[[timeKey]]" selected-items="{{selectedItems}}">
       <vaadin-grid-column>
         <template class="header">Task</template>
         <template>[[item.task]]</template>
@@ -168,8 +201,8 @@
         // grid.selectedItems contains _id and _rev. No more selection.selected...
         _db.remove(this.gridSelected._id, this.gridSelected._rev);
 
-        // Temporary Grid Refresh Solution
-        location.reload();
+        // Temporary Grid Refresh Solution (Included timeout for FireFox related glitch)
+        setTimeout(location.reload(),750);
       }
 
       // Related to Item Selection (Recycled from documentation)
@@ -207,9 +240,10 @@
         grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
         return newDoc;
         });
+        
         // Temporary Grid Refresh Solution
         grid.clearCache();
-        location.reload();
+        setTimeout(location.reload(),750);
       }
 
       // Function: Clear
@@ -223,7 +257,7 @@
         });
 
         // Temporary Grid Refresh Solution
-        location.reload();
+        setTimeout(location.reload(),750);
       }
 
       // Function: Activate Tracker Application
@@ -280,7 +314,7 @@
           console.log(err)
         });
     
-        grid.push('items', { task: this.taskValue, start: this.startValue, end: this.endValue, range: this.rangeValue });
+        grid.push('items', { task: this.timeKey.task, start: this.startValue, end: this.endValue, range: this.rangeValue });
         grid.clearCache();
 
         // Save button re-enabled after pressing 'Stop'

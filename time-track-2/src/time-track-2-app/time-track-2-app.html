@@ -1,34 +1,11 @@
 
 <!-- Time Tracker v2 / Polymer Project-->
+<!-- Entry Point -->
 <!-- Wayne Kenney / 2018 -->
 
-<!-- Update: Using automatic node finding instead of document -->
-
+<!-- Polymer -->
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-
-<!-- Misc Components -->
-<link rel="import" href="../../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
-<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
-<link rel="import" href="../../bower_components/datetime-picker/datetime-picker.html">
-<link rel="import" href="../../bower_components/time-diff/time-diff.html">
-
-<!-- Paper Style Components -->
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
-
-<!-- Vaadin Grid -->
-<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
-<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column.html">
-<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-column-group.html">
-<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-filter.html">
-<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
-<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-tree-toggle.html">
-<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
-<link rel="import" href="../../bower_components/vaadin-dialog/vaadin-dialog.html">
-
-<!-- Iron Ajax -->
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
@@ -46,28 +23,24 @@
 <dom-module id="time-track-2-app">
   <template>
     <style>
-      :host 
-      {
+      :host {
         display: block;
       }
 
-      .form_Whole
-      {
+      .form_Whole {
         width:80%;
         margin-left: auto;
         margin-right: auto;
         display: block;
       }
 
-      .App_Title
-      {
+      .App_Title {
         font-family: 'Lobster', cursive;
         font-size: 40px;
         margin-left: 20px;
       }
       
-      .footer 
-      {
+      .footer {
         position: fixed;
         left: 0;
         bottom: 0;
@@ -81,8 +54,7 @@
       }
 
       @media only screen and (max-width: 750px) {
-      .form_Whole
-      {
+      .form_Whole {
         width: 100%;
       }
     }
@@ -94,8 +66,8 @@
 <!-- Form Container -->
 <div class="form_Whole">
 
-<!-- Time Tracker UI -->
-<ui-loader></ui-loader>
+  <!-- Time Tracker UI -->
+  <ui-loader></ui-loader>
 
 </div>
 
@@ -119,11 +91,6 @@
       created: function() {
         _db = new PouchDB('times');
       },
-
-      // Function: On_Load
-      ready: function() {
-        console.log("Time Tracker 2 ready!");
-    },
 
   });
 
