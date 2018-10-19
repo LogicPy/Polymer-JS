@@ -181,7 +181,7 @@
       }
 
       // Function: Edit [Re-calculate Time Differences]
-      handleEdit(){
+      handleEdit() {
         var diff = this.$.diff;
         var grid = this.$.grid;
         var stime = this.startValue;
@@ -229,7 +229,7 @@
       }
 
       // Function: Activate Tracker Application
-      createTracker(){
+      createTracker() {
         if(this.$.task.value == "")
         {
           // Default Tracker Value if input field is empty
@@ -253,6 +253,7 @@
       // Function: Save
       handleSave() {
         var diff = this.$.diff;
+        var grid = this.$.grid;
         var min = 0;
         var max = 10000;
 
@@ -267,7 +268,6 @@
 
         this.rangeValue = diff.diff;
 
-        var grid = this.$.grid;
         var newDoc = Object.assign({}, this.timeKey);
         if (!newDoc.hasOwnProperty('_id')) {
           newDoc._id = new Date().toISOString();
@@ -282,18 +282,18 @@
           console.log(err)
         });
     
+        grid.push('items', { task: this.taskValue, start: this.startValue, end: this.endValue, range: this.rangeValue });
+        grid.clearCache();
+
         // Save button re-enabled after pressing 'Stop'
         this.saveBtnEnabled = false;
+        this.stopBtnEnabled = true;
 
         // Reset Values
         this.taskValue = "";
         this.startValue = "";
         this.endValue = "";
         this.rangeValue = "";
-
-        // Supposed to refresh grid, but....
-        grid.clearCache();
-        location.reload();
       }
 
       // Function: Calculate Range (Primitive)
