@@ -50,6 +50,7 @@
     </div>
 
     <!-- Form UI -->
+    <dialog-element></dialog-element>
     <div class="form_Objects">
       <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}" value$="{{taskValue}}"></paper-input>
       <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtnEnabled }}">Start Recording</paper-button>

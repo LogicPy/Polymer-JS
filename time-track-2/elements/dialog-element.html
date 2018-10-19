@@ -1,0 +1,69 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+
+<dom-module id="dialog-element">
+  <template>
+    <style>
+
+      :host {
+        display: block;
+      }
+      #clearButton {
+        position: relative;
+        float: right;
+      }
+
+    </style>
+
+<paper-button raised on-tap="dialogDisplay" id="clearButton">About</paper-button>
+
+<vaadin-dialog id="diatest">
+  <template>
+    <div>
+
+    <h4>[[title]]</h4>
+    <p>[[message]]</p>
+
+    </div>
+  </template>
+</vaadin-dialog>
+
+  </template>
+
+  <script>
+    /**
+     * `dialog-element`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class DialogElement extends Polymer.Element {
+      static get is() { return 'dialog-element'; }
+      static get properties() {
+        return {
+            title: {
+              type: String,
+              value: 'Time Tracker 2'
+            },
+            message: {
+              type: String,
+              value: 'Time Tracking tool for logging and organizing daily tasks.'
+            },
+        };
+      }
+
+      return() {
+        this.super();
+      }
+
+      dialogDisplay() {
+        this.$.diatest.opened = true;
+      }
+
+    }
+
+    window.customElements.define(DialogElement.is, DialogElement);
+  </script>
+</dom-module>
