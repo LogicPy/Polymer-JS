@@ -112,6 +112,12 @@
           type: Number,
         },
         // One-way binding for better readability
+        _db: {
+          type: Object,
+          value: function(){
+            return [[]];
+          }
+        },
         gridSelected: {
           type: Object,
           value: function() {
@@ -133,16 +139,22 @@
         activeItem: {
           observer: '_activeItemChanged'
         },
+        
       };
     }
 
+      created() {
+        this._db = new PouchDB('times');
+      }
+
       ready() {
         super.ready();
-
+        
         var grid = this.$.grid;
-
         var options = {};
 
+        // Local DB
+        this._db = new PouchDB('times');
         // Stop button disabled upon load to prevent blank submissions
         this.stopBtnEnabled = true;
         // Range is a computed value / Remains hidden
@@ -153,7 +165,7 @@
         options.include_docs = true;
 
         // New row extraction routine
-        _db.allDocs(options, function(error, response) {
+        this._db.allDocs(options, function(error, response) {
         // map new array 'rows'
         grid.items = response.rows.map(function(row) {
           return row.doc;
@@ -199,7 +211,7 @@
       // Function: Delete
       handleDelete() {
         // grid.selectedItems contains _id and _rev. No more selection.selected...
-        _db.remove(this.gridSelected._id, this.gridSelected._rev);
+        this._db.remove(this.gridSelected._id, this.gridSelected._rev);
 
         // Temporary Grid Refresh Solution (Included timeout for FireFox related glitch)
         setTimeout(location.reload(),750);
@@ -236,11 +248,11 @@
         this.rangeValue = diff.diff;
 
         var newDoc = Object.assign({}, this.timeKey);
-        _db.upsert(this.gridSelected._id, function(doc) {
+        this._db.upsert(this.gridSelected._id, function(doc) {
         grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
         return newDoc;
         });
-        
+
         // Temporary Grid Refresh Solution
         grid.clearCache();
         setTimeout(location.reload(),750);
@@ -248,12 +260,12 @@
 
       // Function: Clear
       handleClear() {
-        _db.allDocs({include_docs: true}).then(allDocs => {
+        this._db.allDocs({include_docs: true}).then(allDocs => {
         return allDocs.rows.map(row => {
           return {_id: row.id, _rev: row.doc._rev, _deleted: true};
         });
         }).then(deleteDocs => {
-          return _db.bulkDocs(deleteDocs);
+          return this._db.bulkDocs(deleteDocs);
         });
 
         // Temporary Grid Refresh Solution
@@ -304,7 +316,7 @@
         if (!newDoc.hasOwnProperty('_id')) {
           newDoc._id = new Date().toISOString();
         }
-        _db.upsert(newDoc._id, function(doc) {
+        this._db.upsert(newDoc._id, function(doc) {
           newDoc._rev = doc._rev;
           return newDoc;
         }).then(function(doc) {
