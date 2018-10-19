@@ -61,8 +61,8 @@
 
       <br><br><label class="statusLabel" id="statuslbl">{{statusOutput}}</label>
 
-      <paper-input style$="visibility: {{startVisibility}};" type="time" id="start" label="Start" on-value-changed="calcRange" value="{{timeKey.start}}" value$="{{startValue}}"></paper-input>
-      <paper-input style$="visibility: {{endVisibility}};" type="time" id="end" label="End" on-value-changed="calcRange" value="{{timeKey.end}}" value$="{{endValue}}"></paper-input>
+      <paper-input style$="visibility: {{startVisibility}};" type="time" id="start" label="Start" value="{{timeKey.start}}" value$="{{startValue}}"></paper-input>
+      <paper-input style$="visibility: {{endVisibility}};" type="time" id="end" label="End" value="{{timeKey.end}}" value$="{{endValue}}"></paper-input>
       <paper-input id="rangeVal" label="Range" value="{{timeKey.range}}" value$="{{rangeValue}}" style$="visibility: {{rangeVisibility}};">Range</paper-input>  
     </div>
 
@@ -182,7 +182,31 @@
 
       // Function: Edit
       handleEdit(){
+        var diff = this.$.diff;
+        var min = 0;
+        var max = 100000;
+
         var grid = this.$.grid;
+
+        var stime = this.startValue;
+        var ftime = this.endValue;
+
+        var splitS = stime.split(":");
+        var splitF = ftime.split(":");
+
+        var std = (splitS[1] * 1000) + (splitS[0] * 60000);
+        var etd = (splitF[1] * 1000) + (splitF[0] * 60000);
+
+        this.StartSeconds = std;
+        this.EndSeconds = etd;
+
+        diff.from = this.StartSeconds;
+        diff.to = this.EndSeconds;
+
+        diff.minUnit = min.value;
+        diff.maxUnit = max.value;
+
+        this.rangeValue = diff.diff;
 
         var newDoc = Object.assign({}, this.timeKey);
         _db.upsert(this.gridSelected._id, function(doc) {
@@ -281,7 +305,6 @@
         var smon = this.startValue;
         var fmon = this.endValue;
         var diff = 0 ;
-
           if (smon && fmon) {
             smon = ConvertToSeconds(smon);
             fmon = ConvertToSeconds(fmon);
@@ -304,7 +327,7 @@
       calcRange2() {
         var diff = this.$.diff;
         var min = 0;
-        var max = 10000;
+        var max = 100000;
 
         diff.from = this.StartSeconds;
         diff.to = this.EndSeconds;
