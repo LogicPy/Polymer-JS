@@ -78,22 +78,23 @@
         gridLength: {
           type: Number,
         },
+        // One-way binding for better readability
         gridSelected: {
           type: Object,
           value: function() {
-            return {};
+            return [[]];
           },
         },
         gridItem: {
           type: Object,
           value: function() {
-            return {};
+            return [[]];
           },
         },
         timeKey: {
           type: Object,
           value: function() {
-            return {};
+            return [[]];
         },
         },
         activeItem: {
@@ -316,20 +317,6 @@
         } 
       }
 
-      // Function: New Range Calculator using Time-Diff Component
-      calcRange2() {
-        var diff = this.$.diff;
-        var min = 0;
-        var max = 100000;
-
-        diff.from = this.StartSeconds;
-        diff.to = this.EndSeconds;
-
-        diff.minUnit = min.value;
-        diff.maxUnit = max.value;
-
-        this.rangeValue = diff.diff;
-        }
       }
 
     window.customElements.define(uiloader.is, uiloader);
