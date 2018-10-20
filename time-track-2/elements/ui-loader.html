@@ -83,7 +83,7 @@
     </div>
 
     <!-- Form UI -->
-    <dialog-element></dialog-element>
+    <dialog-element id="confirm"></dialog-element>
     <div class="form_Objects">
       <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}" value$="{{taskValue}}"></paper-input>
       <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtnEnabled }}">Start Recording</paper-button>
@@ -130,6 +130,12 @@
             return [[]];
           },
         },
+        dialogCom: {
+          type: Object,
+          value: function() {
+            return [[]];
+          },
+        },
         timeKey: {
           type: Object,
           value: function() {
@@ -148,6 +154,7 @@
       };
     }
 
+      // Function: On_Load
       ready() {
         super.ready();
         
@@ -207,14 +214,17 @@
 
       // Function: Delete
       handleDelete() {
-        // grid.selectedItems contains _id and _rev. No more selection.selected...
-        this._db.remove(this.gridSelected._id, this.gridSelected._rev);
+        this.dialogCom = this.$.confirm.$;
 
-        // Temporary Grid Refresh Solution (Included timeout for FireFox related glitch)
-        setTimeout(location.reload(),750);
+        // Show form for confirmation
+        this.dialogCom.confirmDialog.opened = true;
+
+        // Communicate DB Information to dialog element
+        this.dialogCom.gridID.value = this.gridSelected._id;
+        this.dialogCom.gridRev.value = this.gridSelected._rev;
       }
 
-      // Related to Item Selection (Recycled from documentation)
+      // Function: Related to Item Selection (Recycled from documentation)
       _activeItemChanged(item) {
         this.gridItem.selectedItems = item ? [item] : [];
         return this.gridItem.selectedItems;

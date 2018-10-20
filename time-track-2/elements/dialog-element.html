@@ -6,6 +6,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
+<script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
+<script src="../../bower_components/pouchdb-upsert/dist/pouchdb.upsert.js"></script>
+
 <dom-module id="dialog-element">
   <template>
     <style>
@@ -20,12 +23,18 @@
       .btnContainer {
         text-align: center;
       }
+      #gridID, #gridRev {
+        display: none;
+      }
 
     </style>
 
 <paper-button raised on-tap="dialogDisplay" id="clearButton">About</paper-button>
 
-<vaadin-dialog id="aboutMsg" opened="{{opened}}">
+<input type="text" name="" id="gridID">
+<input type="text" name="" id="gridRev">
+
+<vaadin-dialog id="aboutMsg" opened="{{about}}">
   <template>
     <div>
 
@@ -39,7 +48,7 @@
   </template>
 </vaadin-dialog>
 
-<vaadin-dialog id="confirmDialog">
+<vaadin-dialog id="confirmDialog" opened="{{opened}}">
   <template>
     <div>
 
@@ -47,8 +56,8 @@
     <p>[[deleteMsg]]</p>
 
   <div class="btnContainer">
-    <vaadin-button on-click="okClick" theme="raised tertiary" >[[okTxt]]</vaadin-button>
-    <vaadin-button on-click="cancelClick" theme="raised tertiary error">class="right">[[cancelTxt]]</vaadin-button>
+    <vaadin-button on-click="okClick2" theme="raised tertiary" id="clickok">[[okTxt]]</vaadin-button>
+    <vaadin-button on-click="cancelClick" theme="raised tertiary error" class="right">[[cancelTxt]]</vaadin-button>
   </div>
 
     </div>
@@ -94,7 +103,24 @@
               type: String,
               value: 'Cancel'
             },
+            _db: {
+              type: Object,
+              value: function() {
+                return [[]];
+              }
+            },
+            callback: Function,
+            opened: {
+              type: Boolean,
+              notify: true
+            }
         };
+      }
+
+      ready() {
+        super.ready();
+
+        this._db = new PouchDB('times');
       }
 
       dialogDisplay() {
@@ -102,13 +128,31 @@
       }
 
       cancelClick() {
-        this.$.aboutMsg.opened = false;
+        // Cancel
+        console.log('Cancel Clicked');
+        this.$.confirmDialog.opened = false;
       }
 
       okClick() {
-        // Event will go here
-        this.$.aboutMsg.opened = false;
+        this.about = false;
       }
+
+      okClick2() {
+        if (this.callback) {
+          this.callback();
+          delete this.callback;
+        }
+        // Wait for the OK
+        this.dispatchEvent(new CustomEvent('ok-click'));
+        console.log('OK Clicked');
+
+        this._db.remove(this.$.gridID.value, this.$.gridRev.value);
+
+        this.opened = false;
+        this.$.confirmDialog.opened = false;
+
+        setTimeout(location.reload(),2000);
+        }
   }
 
     window.customElements.define(DialogElement.is, DialogElement);
