@@ -4,7 +4,7 @@
 <!-- Wayne Kenney / 2018 -->
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/vaadin-dialog/vaadin-dialog.html">
 
 <script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
 <script src="../../bower_components/pouchdb-upsert/dist/pouchdb.upsert.js"></script>
@@ -146,7 +146,7 @@
           this.callback();
           delete this.callback;
         }
-        
+
         this.dispatchEvent(new CustomEvent('ok-click'));
         this._db.remove(this.$.gridID.value, this.$.gridRev.value);
         this.opened = false;
