@@ -114,7 +114,7 @@
         // One-way binding for better readability
         _db: {
           type: Object,
-          value: function(){
+          value: function() {
             return [[]];
           }
         },
@@ -188,8 +188,7 @@
             this.startVisibility = 'visible';
             this.endVisibility = 'visible';
         }
-        else
-        {
+        else {
             // Otherwise, enable
             this.DelBtnEnable = true;
             this.EditBtnEnable = true;
@@ -197,7 +196,7 @@
             this.endVisibility = 'hidden';
         }
 
-        try{
+        try {
             this.taskValue = this.selectedItems[0].task;
             this.startValue = this.selectedItems[0].start;
             this.endValue = this.selectedItems[0].end;
@@ -272,13 +271,11 @@
 
       // Function: Activate Tracker Application
       createTracker() {
-        if(this.$.task.value == "")
-        {
+        if(this.$.task.value == "") {
           // Default Tracker Value if input field is empty
           this.taskValue = "Tracker";
         }
-        else
-        {
+        else {
           // Textbox already occupied
         }
 
