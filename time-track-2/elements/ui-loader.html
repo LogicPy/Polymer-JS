@@ -54,7 +54,7 @@
     </style>
 
     <!-- Grid Space -->
-    <vaadin-grid id="grid" on-selected-items-changed="handleSelect" active-item="{{activeItem}}" items="[[timeKey]]" selected-items="{{selectedItems}}">
+    <vaadin-grid id="grid" active-item="{{activeItem}}" items="[[timeKey]]" selected-items="{{selectedItems}}">
       <vaadin-grid-column>
         <template class="header">Task</template>
         <template>[[item.task]]</template>
@@ -134,12 +134,17 @@
           type: Object,
           value: function() {
             return [[]];
+          },
         },
+        // Computed Property for item Selection
+        itemSelection: {
+          type: Object,
+          computed: '_computeSelected(selectedItems)'
         },
         activeItem: {
           observer: '_activeItemChanged'
         },
-        
+
       };
     }
 
@@ -173,11 +178,11 @@
         })
       }
 
-      // Function: Selection
-      handleSelect(e) {
-        this.gridLength = this.$.grid.selectedItems.length;
-        this.gridSelected = this.$.grid.selectedItems[0];
+      // Function: Computed property for Selection
+      _computeSelected(selectedItems){
         this.gridItem = this.$.grid;
+        this.gridSelected = selectedItems[0];
+        this.gridLength = selectedItems.length;
 
         // Determine which item is selected in this construct
         if (this.gridLength > 0) {
@@ -195,18 +200,15 @@
             this.startVisibility = 'hidden';
             this.endVisibility = 'hidden';
         }
-          try
-          {
-            // Prepare for edit
-            this.taskValue = this.gridSelected.task;
-            this.startValue = this.gridSelected.start;
-            this.endValue = this.gridSelected.end;
-            this.rangeValue = this.gridSelected.range;
-          }
-          catch{
-            console.log("De-selected");
-          }
+
+        try{
+            this.taskValue = this.selectedItems[0].task;
+            this.startValue = this.selectedItems[0].start;
+            this.endValue = this.selectedItems[0].end;
+            this.rangeValue = this.selectedItems[0].range;
         }
+        catch {}
+      }
 
       // Function: Delete
       handleDelete() {
