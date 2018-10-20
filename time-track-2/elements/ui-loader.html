@@ -331,8 +331,9 @@
           console.log(err)
         });
     
-        grid.push('items', { task: this.timeKey.task, start: this.startValue, end: this.endValue, range: this.rangeValue });
+        //grid.push('items', { task: this.timeKey.task, start: this.startValue, end: this.endValue, range: this.rangeValue });
         grid.clearCache();
+        setTimeout(location.reload(),750);
 
         // Save button re-enabled after pressing 'Stop'
         this.saveBtnEnabled = false;
