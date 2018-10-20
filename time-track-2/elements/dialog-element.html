@@ -124,13 +124,13 @@
       }
 
       dialogDisplay() {
-        this.$.aboutMsg.opened = true;
+        this.opened = true;
       }
 
       cancelClick() {
         // Cancel
         console.log('Cancel Clicked');
-        this.$.confirmDialog.opened = false;
+        this.opened = false;
       }
 
       okClick() {
@@ -149,7 +149,6 @@
         this._db.remove(this.$.gridID.value, this.$.gridRev.value);
 
         this.opened = false;
-        this.$.confirmDialog.opened = false;
 
         setTimeout(location.reload(),2000);
         }
