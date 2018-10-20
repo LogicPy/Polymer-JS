@@ -129,8 +129,11 @@
 
       cancelClick() {
         // Cancel
-        console.log('Cancel Clicked');
+        delete this.callback;
+        this.dispatchEvent(new CustomEvent('cancel-click'));
         this.opened = false;
+
+        console.log('Cancel Clicked');
       }
 
       okClick() {
@@ -138,17 +141,17 @@
       }
 
       okClick2() {
+        // Wait for the OK
         if (this.callback) {
           this.callback();
           delete this.callback;
         }
-        // Wait for the OK
+        
         this.dispatchEvent(new CustomEvent('ok-click'));
-        console.log('OK Clicked');
-
         this._db.remove(this.$.gridID.value, this.$.gridRev.value);
-
         this.opened = false;
+
+        console.log('OK Clicked');
 
         setTimeout(location.reload(),2000);
         }
