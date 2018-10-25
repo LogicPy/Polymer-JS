@@ -1,0 +1,71 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<!-- Database Components -->
+<script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
+<script src="../../bower_components/pouchdb-upsert/dist/pouchdb.upsert.js"></script>
+
+
+<dom-module id="time-tracker-data">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+  </template>
+
+  <script>
+
+    class TimeTrackerData extends Polymer.Element {
+      static get is() { return 'time-tracker-data'; }
+      static get properties() {
+        return {
+        _db: {
+          type: Object,
+          value: function() {
+            return [[]];
+          }
+        },
+        row_out: {
+          type: Object,
+          value: function() {
+            return [[]];
+          }
+        },
+
+        };
+      }
+    
+      ready() {
+        super.ready();
+
+        this._db = new PouchDB('times');
+
+        var options = {};
+        var rows;
+
+        options.include_docs = true;
+
+        // New row extraction routine
+
+        rows = this._db.allDocs(options).then(function (result) {
+
+            return result.rows;
+
+        }).then((value)=>{
+               this.row_out = value;
+               return this.Extraction(this.row_out)
+             });
+    }
+
+    Extraction(rows) {
+      return rows;
+    }
+
+
+  }
+
+    window.customElements.define(TimeTrackerData.is, TimeTrackerData);
+  </script>
+</dom-module>
