@@ -167,6 +167,7 @@
         itemSelection: {
           type: Object,
           computed: '_computeSelected(selectedItems)'
+
         },
         activeItem: {
           observer: '_activeItemChanged'
@@ -223,36 +224,30 @@
         var args = e.target.getAttribute('data-args').split(',');
 
         // Default Declarations
-        var diff = this.$.diff;
-        var grid = this.$.grid;
-        var stime = this.startValue;
-        var ftime = this.endValue;
-        var min = 0;
-        var max = 10000;
+        var [diff, grid, stime, ftime, min, max] = [this.$.diff, this.$.grid, this.startValue, this.endValue, 0, 10000]
 
         // On save / specific changes
         if (args == "save") {
-          this.endValue = (new Date).toTimeString().slice(0,8);
-          this.EndSeconds = Date.now();
-          this.saveBtnEnabled = false;
-          this.stopBtnEnabled = true;
+          // Set Time
+          [this.endValue, this.EndSeconds] = [(new Date).toTimeString().slice(0,8), Date.now()];
+          // Button Toggle
+          [this.saveBtnEnabled, this.stopBtnEnabled] = [false, true]
         }
 
         // On edit / specific changes
         else if(args == "edit") {
-          var splitS = stime.split(":");
-          var splitF = ftime.split(":");
-          var std = (splitS[1] * 1000) + (splitS[0] * 60000);
-          var etd = (splitF[1] * 1000) + (splitF[0] * 60000);
-          this.StartSeconds = std;
-          this.EndSeconds = etd;
+
+          // Set Time Calculation Variables
+          var [splitS, splitF, std, etd] = [stime.split(":"), ftime.split(":"), (splitS[1] * 1000) + (splitS[0] * 60000), (splitF[1] * 1000) + (splitF[0] * 60000)]
+
+          // Set Start and End
+          [this.StartSeconds, this.EndSeconds] = [std, etd];
         }
 
         // Difference Calculation
-        diff.from = this.StartSeconds;
-        diff.to = this.EndSeconds;
-        diff.minUnit = min.value;
-        diff.maxUnit = max.value;
+        [diff.from, diff.to, diff.minUnit, diff.maxUnit] = [this.StartSeconds, this.EndSeconds, min.value, max.value];
+
+        // Set Range Value
         this.rangeValue = diff.diff;
 
         // Call to Update Grid
@@ -265,10 +260,7 @@
         }
 
         // Reset Values
-        this.taskValue = "";
-        this.startValue = "";
-        this.endValue = "";
-        this.rangeValue = "";
+        this.taskValue = this.startValue = this.endValue = this.rangeValue = "";
       }
 
       // Function: Activate Tracker Application
@@ -277,14 +269,11 @@
           // Default Tracker Value if input field is empty
           this.taskValue = "Tracker";
         }
-        
-        // Start Time in Seconds
-        this.StartSeconds = Date.now();
 
         // Starting Time in Standard Format
-        this.startValue = (new Date).toTimeString().slice(0,8);
-        this.saveBtnEnabled = true;
-        this.stopBtnEnabled = false;
+        [this.StartSeconds, this.startValue, this.saveBtnEnabled, this.stopBtnEnabled] = [Date.now(), (new Date).toTimeString().slice(0,8), true, false];
+
+        // Display Status
         this.statusOutput = "Recording Tracker - Press 'Stop and Save' to stop recording";
       }
 
@@ -294,36 +283,31 @@
         return this.gridBase.selectedItems;
       }
 
-      handleSelect(e) {
-        // Determine which item is selected in this construct
-        if (this.gridLength > 0) {
-            // If not selected, disable buttons
-            this.DelBtnEnable = false;
-            this.EditBtnEnable = false;     
-            this.startVisibility = 'visible';
-            this.endVisibility = 'visible';
-        }
-        else {
-            // Otherwise, enable
-            this.DelBtnEnable = true;
-            this.EditBtnEnable = true;
-            this.startVisibility = 'hidden';
-            this.endVisibility = 'hidden';
-        }
-
-        try {
-            this.taskValue = this.selectedItems[0].task;
-            this.startValue = this.selectedItems[0].start;
-            this.endValue = this.selectedItems[0].end;
-            this.rangeValue = this.selectedItems[0].range;
-        }
-        catch {}
-      }
-
       // Function: Computed property for Selection
       _computeSelected(selectedItems) {
         this.gridSelected = selectedItems[0];
         this.gridLength = selectedItems.length;
+
+        // Determine which item is selected in this construct
+        if (this.gridLength > 0) {
+            // Disable Buttons
+            [this.DelBtnEnable, this.EditBtnEnable] = [false, false];
+            // Show Text Boxes
+            [this.startVisibility, this.endVisibility] = ['visible', 'visible'];
+        }
+        else {
+            // Enable Buttons
+            [this.DelBtnEnable, this.EditBtnEnable] = [true, true];
+            // Hide Text Boxes
+            [this.startVisibility, this.endVisibility] = ['hidden', 'hidden'];
+        }
+
+        try {
+            // Set Values to text boxes
+            [this.taskValue, this.startValue, this.endValue, this.rangeValue] = [this.selectedItems[0].task, this.selectedItems[0].start, this.selectedItems[0].end, this.selectedItems[0].range];
+        }
+        catch {}
+
         return selectedItems;
       }
     }
