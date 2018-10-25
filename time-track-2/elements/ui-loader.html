@@ -18,22 +18,12 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-sorter.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-tree-toggle.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
-<link rel="import" href="../../bower_components/vaadin-dialog/vaadin-dialog.html">
 
 <!-- Misc Components -->
 <link rel="import" href="../../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
 <link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../../bower_components/datetime-picker/datetime-picker.html">
 <link rel="import" href="../../bower_components/time-diff/time-diff.html">
-
-<!-- Database Components -->
-<script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
-<script src="../../bower_components/pouchdb-upsert/dist/pouchdb.upsert.js"></script>
-
-<!-- Elements -->
-<link rel="import" href="../../elements/ui-loader.html">
-<link rel="import" href="../../elements/dialog-element.html">
-<link rel="import" href="../../elements/time-tracker-data.html">
 
 <!-- Iron Ajax -->
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
@@ -191,11 +181,9 @@
 
         // Call Grid function
         setTimeout(() => { this.push_Grid(); }, 250); 
-
-
       }
 
-      // Function: Push rows to Grid
+      // Function: Retrieve Rows / Add to Grid
       push_Grid() {
         // Access db rows
         this._db_extract = this.$.row_items.row_out;
@@ -205,7 +193,6 @@
         });
         
       }
-
 
       // Function: Computed property for Selection
       _computeSelected(selectedItems) {
