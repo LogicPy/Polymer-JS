@@ -206,7 +206,6 @@
 
       // Function: Delete
       handleDelete() {
-
         // Show form for confirmation
         this.dialogCom.confirmDialog.opened = true;
 
@@ -217,7 +216,6 @@
 
       // Function: Save & Edit
       handleSave(e) {
-
         var args = e.target.getAttribute('data-args').split(',');
         var diff = this.$.diff;
         var grid = this.$.grid;
@@ -323,29 +321,6 @@
         catch {}
 
         return selectedItems;
-      }
-
-      // Function: Calculate Range (Primitive)
-      calcRange() {
-        var smon = this.startValue;
-        var fmon = this.endValue;
-        var diff = 0 ;
-          if (smon && fmon) {
-            smon = ConvertToSeconds(smon);
-            fmon = ConvertToSeconds(fmon);
-            diff = Math.abs( fmon - smon );
-            this.rangeValue = secondsTohhmmss(diff);
-          }
-          function ConvertToSeconds(time) {
-            var splitTime = time.split(":");
-            return splitTime[0] * 3600 + splitTime[1] * 60;
-          }
-          function secondsTohhmmss(secs) {
-            var hours = parseInt(secs / 3600);
-            var seconds = parseInt(secs % 3600);
-            var minutes = parseInt(seconds / 60) ;
-            return seconds + " seconds ";
-        } 
       }
 
       }
