@@ -281,11 +281,11 @@
 
         // Call to Update
         if(args == "save") {
-          this.db_Update("save", grid);
+          this.$.row_items.db_Update("save", grid, this.timeKey);
         }
         // Call to Update
         else if(args == "edit") {
-          this.db_Update("edit", grid);
+          this.$.row_items.db_Update("edit", grid, this.timeKey);
         }
 
         // Reset Values
@@ -293,31 +293,6 @@
         this.startValue = "";
         this.endValue = "";
         this.rangeValue = "";
-      }
-
-      // Function: Pass Update Values / Add to DB
-      db_Update(value, grid) {
-
-        if (value == "save") {
-        var newDoc = Object.assign({}, this.timeKey);
-        if (!newDoc.hasOwnProperty('_id')) {
-          newDoc._id = new Date().toISOString();
-        }
-        this._db.upsert(newDoc._id, function(doc) {
-          newDoc._rev = doc._rev;
-          return newDoc;
-        })
-
-        }
-        else if (value == "edit"){
-          var newDoc = Object.assign({}, this.timeKey);
-          this._db.upsert(this.gridSelected._id, function(doc) {
-          grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
-          return newDoc;
-          });
-        }
-
-        setTimeout(location.reload(),750);
       }
 
       // Function: Clear
