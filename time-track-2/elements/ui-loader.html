@@ -56,7 +56,7 @@
     <time-tracker-data id="row_items"></time-tracker-data>
 
     <!-- Grid Space -->
-    <vaadin-grid id="grid" active-item="{{activeItem}}" items="[[_db_extract]]" selected-items="{{selectedItems}}">
+    <vaadin-grid id="grid" active-item="{{activeItem}}" items="[[_db_extract]]" selected-items="{{selectedItems}}" on-selected-items-changed="handleSelect">
       <vaadin-grid-column>
         <template class="header">Task</template>
         <template>[[item.task]]</template>
@@ -114,7 +114,7 @@
         gridLength: {
           type: Number,
         },
-        // One-way binding for better readability
+        // Database Object
         _db: {
           type: Object,
           value: function() {
@@ -142,14 +142,14 @@
             return [[]];
           },
         },
-        // Dialog Component
+        // Dialog Object
         dialogCom: {
           type: Object,
           value: function() {
             return [[]];
           },
         },
-        // Data Component
+        // Data Object
         dataCom: {
           type: Object,
           value: function() {
@@ -277,10 +277,7 @@
           // Default Tracker Value if input field is empty
           this.taskValue = "Tracker";
         }
-        else {
-          // Textbox already occupied
-        }
-
+        
         // Start Time in Seconds
         this.StartSeconds = Date.now();
 
@@ -297,12 +294,7 @@
         return this.gridBase.selectedItems;
       }
 
-      // Function: Computed property for Selection
-      _computeSelected(selectedItems) {
-        this.gridBase = this.$.grid;
-        this.gridSelected = selectedItems[0];
-        this.gridLength = selectedItems.length;
-
+      handleSelect(e) {
         // Determine which item is selected in this construct
         if (this.gridLength > 0) {
             // If not selected, disable buttons
@@ -326,7 +318,12 @@
             this.rangeValue = this.selectedItems[0].range;
         }
         catch {}
+      }
 
+      // Function: Computed property for Selection
+      _computeSelected(selectedItems) {
+        this.gridSelected = selectedItems[0];
+        this.gridLength = selectedItems.length;
         return selectedItems;
       }
     }
