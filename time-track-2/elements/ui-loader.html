@@ -84,9 +84,9 @@
     <div class="form_Objects">
       <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}" value$="{{taskValue}}"></paper-input>
       <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtnEnabled }}">Start Recording</paper-button>
-      <paper-button raised on-tap="handleSave" id="stopButton" disabled$="{{ stopBtnEnabled }}">Stop and Save</paper-button>
+      <paper-button raised on-tap="handleSave" id="stopButton" disabled$="{{ stopBtnEnabled }}" data-args="save">Stop and Save</paper-button>
       <paper-button raised on-tap="handleDelete" id="deleteButton" disabled$="{{ DelBtnEnable }}">Delete</paper-button>
-      <paper-button raised on-tap="handleEdit" id="editButton" disabled$="{{ EditBtnEnable }}">Edit</paper-button>
+      <paper-button raised on-tap="handleSave" id="editButton" disabled$="{{ EditBtnEnable }}" data-args="edit">Edit</paper-button>
       <paper-button raised on-tap="handleClear" id="clearButton">Clear</paper-button>
 
       <br><br><label class="statusLabel" id="statuslbl">{{statusOutput}}</label>
@@ -223,6 +223,8 @@
             this.rangeValue = this.selectedItems[0].range;
         }
         catch {}
+
+        return selectedItems;
       }
 
       // Function: Delete
@@ -242,38 +244,79 @@
         return this.gridItem.selectedItems;
       }
 
-      // Function: Edit [Re-calculate Time Differences]
-      handleEdit() {
+      // Function: Save & Edit
+      handleSave(e) {
+
+        var args = e.target.getAttribute('data-args').split(',');
         var diff = this.$.diff;
         var grid = this.$.grid;
         var stime = this.startValue;
         var ftime = this.endValue;
-        var splitS = stime.split(":");
-        var splitF = ftime.split(":");
-        var std = (splitS[1] * 1000) + (splitS[0] * 60000);
-        var etd = (splitF[1] * 1000) + (splitF[0] * 60000);
         var min = 0;
-        var max = 100000;
+        var max = 10000;
 
-        this.StartSeconds = std;
-        this.EndSeconds = etd;
+        // On save / specific changes
+        if (args == "save") {
+          this.endValue = (new Date).toTimeString().slice(0,8);
+          this.EndSeconds = Date.now();
+          this.saveBtnEnabled = false;
+          this.stopBtnEnabled = true;
+        }
+
+        // On edit / specific changes
+        else if(args == "edit") {
+          var splitS = stime.split(":");
+          var splitF = ftime.split(":");
+          var std = (splitS[1] * 1000) + (splitS[0] * 60000);
+          var etd = (splitF[1] * 1000) + (splitF[0] * 60000);
+          this.StartSeconds = std;
+          this.EndSeconds = etd;
+        }
 
         diff.from = this.StartSeconds;
         diff.to = this.EndSeconds;
-
         diff.minUnit = min.value;
         diff.maxUnit = max.value;
-
         this.rangeValue = diff.diff;
 
-        var newDoc = Object.assign({}, this.timeKey);
-        this._db.upsert(this.gridSelected._id, function(doc) {
-        grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
-        return newDoc;
-        });
+        // Call to Update
+        if(args == "save") {
+          this.db_Update("save", grid);
+        }
+        // Call to Update
+        else if(args == "edit") {
+          this.db_Update("edit", grid);
+        }
 
-        // Temporary Grid Refresh Solution
-        grid.clearCache();
+        // Reset Values
+        this.taskValue = "";
+        this.startValue = "";
+        this.endValue = "";
+        this.rangeValue = "";
+      }
+
+      // Function: Pass Update Values / Add to DB
+      db_Update(value, grid) {
+
+        if (value == "save") {
+        var newDoc = Object.assign({}, this.timeKey);
+        if (!newDoc.hasOwnProperty('_id')) {
+          newDoc._id = new Date().toISOString();
+        }
+        this._db.upsert(newDoc._id, function(doc) {
+          newDoc._rev = doc._rev;
+          return newDoc;
+        })
+
+        }
+        else if (value == "edit"){
+          var newDoc = Object.assign({}, this.timeKey);
+          this._db.upsert(this.gridSelected._id, function(doc) {
+          grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
+          return newDoc;
+          });
+        }
+
         setTimeout(location.reload(),750);
       }
 
@@ -310,53 +353,6 @@
         this.saveBtnEnabled = true;
         this.stopBtnEnabled = false;
         this.statusOutput = "Recording Tracker - Press 'Stop and Save' to stop recording";
-      }
-
-      // Function: Save
-      handleSave() {
-        var diff = this.$.diff;
-        var grid = this.$.grid;
-        var min = 0;
-        var max = 10000;
-
-        this.endValue = (new Date).toTimeString().slice(0,8);
-        this.EndSeconds = Date.now();
-
-        diff.from = this.StartSeconds;
-        diff.to = this.EndSeconds;
-
-        diff.minUnit = min.value;
-        diff.maxUnit = max.value;
-
-        this.rangeValue = diff.diff;
-
-        var newDoc = Object.assign({}, this.timeKey);
-        if (!newDoc.hasOwnProperty('_id')) {
-          newDoc._id = new Date().toISOString();
-        }
-        this._db.upsert(newDoc._id, function(doc) {
-          newDoc._rev = doc._rev;
-          return newDoc;
-        }).then(function(doc) {
-
-
-        }).catch(function(err) {
-          console.log(err)
-        });
-    
-        //grid.push('items', { task: this.timeKey.task, start: this.startValue, end: this.endValue, range: this.rangeValue });
-        grid.clearCache();
-        setTimeout(location.reload(),750);
-
-        // Save button re-enabled after pressing 'Stop'
-        this.saveBtnEnabled = false;
-        this.stopBtnEnabled = true;
-
-        // Reset Values
-        this.taskValue = "";
-        this.startValue = "";
-        this.endValue = "";
-        this.rangeValue = "";
       }
 
       // Function: Calculate Range (Primitive)
