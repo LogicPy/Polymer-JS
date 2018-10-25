@@ -179,16 +179,14 @@
       // Function: On_Load
       ready() {
         super.ready();
-        
-        // Initial Definitions
-        this._db = new PouchDB('times');
-        this.gridBase = this.$.grid;
-        this.dialogCom = this.$.confirm.$;
-        this.dataCom = this.$.row_items;
 
+        // Database and Grid
+        [this._db, this.gridBase] = [new PouchDB('times'), this.$.grid];
+        // Dialog and Data Elements
+        [this.dialogCom, this.dataCom] = [this.$.confirm.$, this.$.row_items];
         // Stop button disabled upon load to prevent blank submissions
         this.stopBtnEnabled = true;
-        // Range is a computed value / Remains hidden
+        // Range Remains hidden
         this.rangeVisibility = 'hidden';
         // Instructions for activation
         this.statusOutput = "Press 'Start Recording' to begin";
@@ -212,7 +210,6 @@
       handleDelete() {
         // Show form for confirmation
         this.dialogCom.confirmDialog.opened = true;
-
         // Communicate DB Information to dialog element
         this.dialogCom.gridID.value = this.gridSelected._id;
         this.dialogCom.gridRev.value = this.gridSelected._rev;
@@ -222,9 +219,10 @@
       handleSave(e) {
         // Arguments to function for conditions (Save OR Edit)
         var args = e.target.getAttribute('data-args').split(',');
-
-        // Default Declarations
-        var [diff, grid, stime, ftime, min, max] = [this.$.diff, this.$.grid, this.startValue, this.endValue, 0, 10000]
+        // from objects [Destructuring assignment es6 syntax]
+        var [diff, grid, stime, ftime] = [this.$.diff, this.$.grid, this.startValue, this.endValue]
+        // Minimum and Max
+        var [min, max] = [0, 10000]
 
         // On save / specific changes
         if (args == "save") {
@@ -236,11 +234,12 @@
 
         // On edit / specific changes
         else if(args == "edit") {
+          // Split Values to Array
+          var [splitS, splitF] = [stime.split(":"), ftime.split(":")]
+          // Calculate Seconds
+          var [std, etd] = [(splitS[1] * 1000) + (splitS[0] * 60000), (splitF[1] * 1000) + (splitF[0] * 60000)]
 
-          // Set Time Calculation Variables
-          var [splitS, splitF, std, etd] = [stime.split(":"), ftime.split(":"), (splitS[1] * 1000) + (splitS[0] * 60000), (splitF[1] * 1000) + (splitF[0] * 60000)]
-
-          // Set Start and End
+          // Set 'Start' and 'End' for Difference Calculation with Time-Diff
           [this.StartSeconds, this.EndSeconds] = [std, etd];
         }
 
@@ -249,8 +248,7 @@
 
         // Set Range Value
         this.rangeValue = diff.diff;
-
-        // Call to Update Grid
+        // Call to Add to Grid
         if(args == "save") {
           this.dataCom.db_Update("save", grid, this.timeKey);
         }
@@ -258,7 +256,6 @@
         else if(args == "edit") {
           this.dataCom.db_Update("edit", grid, this.timeKey);
         }
-
         // Reset Values
         this.taskValue = this.startValue = this.endValue = this.rangeValue = "";
       }
@@ -269,10 +266,10 @@
           // Default Tracker Value if input field is empty
           this.taskValue = "Tracker";
         }
-
         // Starting Time in Standard Format
-        [this.StartSeconds, this.startValue, this.saveBtnEnabled, this.stopBtnEnabled] = [Date.now(), (new Date).toTimeString().slice(0,8), true, false];
-
+        [this.StartSeconds, this.startValue] = [Date.now(), (new Date).toTimeString().slice(0,8)];
+        // Toggle Buttons
+        [this.saveBtnEnabled, this.stopBtnEnabled] = [true, false]
         // Display Status
         this.statusOutput = "Recording Tracker - Press 'Stop and Save' to stop recording";
       }
@@ -287,7 +284,6 @@
       _computeSelected(selectedItems) {
         this.gridSelected = selectedItems[0];
         this.gridLength = selectedItems.length;
-
         // Determine which item is selected in this construct
         if (this.gridLength > 0) {
             // Disable Buttons
@@ -301,13 +297,11 @@
             // Hide Text Boxes
             [this.startVisibility, this.endVisibility] = ['hidden', 'hidden'];
         }
-
         try {
             // Set Values to text boxes
             [this.taskValue, this.startValue, this.endValue, this.rangeValue] = [this.selectedItems[0].task, this.selectedItems[0].start, this.selectedItems[0].end, this.selectedItems[0].range];
         }
         catch {}
-
         return selectedItems;
       }
     }
