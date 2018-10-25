@@ -34,7 +34,7 @@
           }
         },
 
-        };
+      };
       }
     
       ready() {
@@ -47,8 +47,6 @@
 
         options.include_docs = true;
 
-        // New row extraction routine
-
         rows = this._db.allDocs(options).then(function (result) {
 
             return result.rows;
@@ -60,10 +58,8 @@
     }
 
     Extraction(rows) {
-      console.log(this.row_out);
       return this.row_out;
     }
-
 
   }
 

@@ -131,6 +131,12 @@
             return [[]];
           }
         },
+        gridBase: {
+          type: Object,
+          value: function() {
+            return [[]];
+          }
+        },
         gridSelected: {
           type: Object,
           value: function() {
@@ -171,8 +177,10 @@
       ready() {
         super.ready();
         
-        // Set DB
+        // Initial Definitions
         this._db = new PouchDB('times');
+        this.gridBase = this.$.grid;
+        this.dialogCom = this.$.confirm.$;
 
         // Stop button disabled upon load to prevent blank submissions
         this.stopBtnEnabled = true;
@@ -181,18 +189,18 @@
         // Instructions for activation
         this.statusOutput = "Press 'Start Recording' to begin";
 
+        // Call Grid function
         setTimeout(() => { this.push_Grid(); }, 250); 
 
 
       }
 
+      // Function: Push rows to Grid
       push_Grid() {
-
-        var grid = this.$.grid;
-
+        // Access db rows
         this._db_extract = this.$.row_items.row_out;
-
-        grid.items = this._db_extract.map(function(row) {
+        // Set rows to grid
+        this.gridBase.items = this._db_extract.map(function(row) {
         return row.doc;
         });
         
@@ -232,8 +240,6 @@
 
       // Function: Delete
       handleDelete() {
-
-        this.dialogCom = this.$.confirm.$;
 
         // Show form for confirmation
         this.dialogCom.confirmDialog.opened = true;
