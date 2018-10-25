@@ -86,12 +86,12 @@
         // Edit current tracker
         else if (option == "edit") {
           var newDoc = Object.assign({}, this.timeKey);
-          this._db.upsert(grid.selectedItems._id, function(doc) {
+          this._db.upsert(grid.selectedItems[0]._id, function(doc) {
           grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
           return newDoc;
           });
         }
-        setTimeout(location.reload(),750);
+        setTimeout(location.reload(), 750);
       }
 
       // Function: Return rows to UI element
