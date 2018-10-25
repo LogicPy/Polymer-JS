@@ -65,39 +65,38 @@
         }).then((value)=>{
                this.row_out = value;
                return this.Extraction(this.row_out)
-             });
-    }
-
-    // Function: Pass Update Values / Add to DB
-    db_Update(option, grid, timeKey) {
-      this.timeKey = timeKey;
-
-      if (option == "save") {
-      var newDoc = Object.assign({}, this.timeKey);
-      if (!newDoc.hasOwnProperty('_id')) {
-        newDoc._id = new Date().toISOString();
-      }
-      this._db.upsert(newDoc._id, function(doc) {
-        newDoc._rev = doc._rev;
-        return newDoc;
-      })
-      }
-      else if (option == "edit"){
-        var newDoc = Object.assign({}, this.timeKey);
-        this._db.upsert(grid.selectedItems._id, function(doc) {
-        grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
-        return newDoc;
         });
       }
-      setTimeout(location.reload(),750);
-    }
 
-    // Function: Return rows to UI element
-    Extraction(rows) {
-      return this.row_out;
-    }
+      // Function: Pass Update Values / Add to DB
+      db_Update(option, grid, timeKey) {
+        this.timeKey = timeKey;
 
-  }
+        if (option == "save") {
+        var newDoc = Object.assign({}, this.timeKey);
+        if (!newDoc.hasOwnProperty('_id')) {
+          newDoc._id = new Date().toISOString();
+        }
+        this._db.upsert(newDoc._id, function(doc) {
+          newDoc._rev = doc._rev;
+          return newDoc;
+        })
+        }
+        else if (option == "edit"){
+          var newDoc = Object.assign({}, this.timeKey);
+          this._db.upsert(grid.selectedItems._id, function(doc) {
+          grid.selectedItems[0]._rev = grid.selectedItems[0]._rev;
+          return newDoc;
+          });
+        }
+        setTimeout(location.reload(),750);
+      }
+
+      // Function: Return rows to UI element
+      Extraction(rows) {
+        return this.row_out;
+      }
+    }
 
     window.customElements.define(TimeTrackerData.is, TimeTrackerData);
   </script>

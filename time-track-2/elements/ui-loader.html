@@ -25,6 +25,10 @@
 <link rel="import" href="../../bower_components/datetime-picker/datetime-picker.html">
 <link rel="import" href="../../bower_components/time-diff/time-diff.html">
 
+<!-- Database Components -->
+<script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
+<script src="../../bower_components/pouchdb-upsert/dist/pouchdb.upsert.js"></script>
+
 <!-- Iron Ajax -->
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
@@ -87,7 +91,6 @@
       <paper-button raised on-tap="handleSave" id="stopButton" disabled$="{{ stopBtnEnabled }}" data-args="save">Stop and Save</paper-button>
       <paper-button raised on-tap="handleDelete" id="deleteButton" disabled$="{{ DelBtnEnable }}">Delete</paper-button>
       <paper-button raised on-tap="handleSave" id="editButton" disabled$="{{ EditBtnEnable }}" data-args="edit">Edit</paper-button>
-      <paper-button raised on-tap="handleClear" id="clearButton">Clear</paper-button>
 
       <br><br><label class="statusLabel" id="statuslbl">{{statusOutput}}</label>
 
@@ -145,6 +148,12 @@
             return [[]];
           },
         },
+        dataCom: {
+          type: Object,
+          value: function() {
+            return [[]];
+          },
+        },
         timeKey: {
           type: Object,
           value: function() {
@@ -171,6 +180,7 @@
         this._db = new PouchDB('times');
         this.gridBase = this.$.grid;
         this.dialogCom = this.$.confirm.$;
+        this.dataCom = this.$.row_items;
 
         // Stop button disabled upon load to prevent blank submissions
         this.stopBtnEnabled = true;
@@ -186,45 +196,12 @@
       // Function: Retrieve Rows / Add to Grid
       push_Grid() {
         // Access db rows
-        this._db_extract = this.$.row_items.row_out;
+        this._db_extract = this.dataCom.row_out;
         // Set rows to grid
         this.gridBase.items = this._db_extract.map(function(row) {
         return row.doc;
         });
         
-      }
-
-      // Function: Computed property for Selection
-      _computeSelected(selectedItems) {
-        this.gridItem = this.$.grid;
-        this.gridSelected = selectedItems[0];
-        this.gridLength = selectedItems.length;
-
-        // Determine which item is selected in this construct
-        if (this.gridLength > 0) {
-            // If not selected, disable buttons
-            this.DelBtnEnable = false;
-            this.EditBtnEnable = false;     
-            this.startVisibility = 'visible';
-            this.endVisibility = 'visible';
-        }
-        else {
-            // Otherwise, enable
-            this.DelBtnEnable = true;
-            this.EditBtnEnable = true;
-            this.startVisibility = 'hidden';
-            this.endVisibility = 'hidden';
-        }
-
-        try {
-            this.taskValue = this.selectedItems[0].task;
-            this.startValue = this.selectedItems[0].start;
-            this.endValue = this.selectedItems[0].end;
-            this.rangeValue = this.selectedItems[0].range;
-        }
-        catch {}
-
-        return selectedItems;
       }
 
       // Function: Delete
@@ -236,12 +213,6 @@
         // Communicate DB Information to dialog element
         this.dialogCom.gridID.value = this.gridSelected._id;
         this.dialogCom.gridRev.value = this.gridSelected._rev;
-      }
-
-      // Function: Related to Item Selection (Recycled from documentation)
-      _activeItemChanged(item) {
-        this.gridItem.selectedItems = item ? [item] : [];
-        return this.gridItem.selectedItems;
       }
 
       // Function: Save & Edit
@@ -281,11 +252,11 @@
 
         // Call to Update
         if(args == "save") {
-          this.$.row_items.db_Update("save", grid, this.timeKey);
+          this.dataCom.db_Update("save", grid, this.timeKey);
         }
         // Call to Update
         else if(args == "edit") {
-          this.$.row_items.db_Update("edit", grid, this.timeKey);
+          this.dataCom.db_Update("edit", grid, this.timeKey);
         }
 
         // Reset Values
@@ -293,21 +264,6 @@
         this.startValue = "";
         this.endValue = "";
         this.rangeValue = "";
-      }
-
-      // Function: Clear
-      handleClear() {
-      
-        this._db.allDocs({include_docs: true}).then(allDocs => {
-        return allDocs.rows.map(row => {
-          return {_id: row.id, _rev: row.doc._rev, _deleted: true};
-        });
-        }).then(deleteDocs => {
-          return this._db.bulkDocs(deleteDocs);
-        });
-
-        // Temporary Grid Refresh Solution
-        setTimeout(location.reload(),750);
       }
 
       // Function: Activate Tracker Application
@@ -328,6 +284,45 @@
         this.saveBtnEnabled = true;
         this.stopBtnEnabled = false;
         this.statusOutput = "Recording Tracker - Press 'Stop and Save' to stop recording";
+      }
+
+      // Function: Related to Item Selection (Recycled from documentation)
+      _activeItemChanged(item) {
+        this.gridItem.selectedItems = item ? [item] : [];
+        return this.gridItem.selectedItems;
+      }
+
+      // Function: Computed property for Selection
+      _computeSelected(selectedItems) {
+        this.gridItem = this.$.grid;
+        this.gridSelected = selectedItems[0];
+        this.gridLength = selectedItems.length;
+
+        // Determine which item is selected in this construct
+        if (this.gridLength > 0) {
+            // If not selected, disable buttons
+            this.DelBtnEnable = false;
+            this.EditBtnEnable = false;     
+            this.startVisibility = 'visible';
+            this.endVisibility = 'visible';
+        }
+        else {
+            // Otherwise, enable
+            this.DelBtnEnable = true;
+            this.EditBtnEnable = true;
+            this.startVisibility = 'hidden';
+            this.endVisibility = 'hidden';
+        }
+
+        try {
+            this.taskValue = this.selectedItems[0].task;
+            this.startValue = this.selectedItems[0].start;
+            this.endValue = this.selectedItems[0].end;
+            this.rangeValue = this.selectedItems[0].range;
+        }
+        catch {}
+
+        return selectedItems;
       }
 
       // Function: Calculate Range (Primitive)
