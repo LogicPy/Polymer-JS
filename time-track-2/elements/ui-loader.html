@@ -52,6 +52,7 @@
     
     </style>
 
+    <!-- Data Source / DB Data -->
     <time-tracker-data id="row_items"></time-tracker-data>
 
     <!-- Grid Space -->
@@ -85,6 +86,7 @@
 
     <!-- Form UI -->
     <dialog-element id="confirm"></dialog-element>
+
     <div class="form_Objects">
       <paper-input type="text" id="task" label="Tracker Name" value="{{timeKey.task}}" value$="{{taskValue}}"></paper-input>
       <paper-button raised on-tap="createTracker" id="saveButton" disabled$="{{ saveBtnEnabled }}">Start Recording</paper-button>
@@ -108,6 +110,7 @@
       static get properties() {
         return {
 
+        // Length of Grid
         gridLength: {
           type: Number,
         },
@@ -118,42 +121,42 @@
             return [[]];
           }
         },
+        // Rows from Tracker-data element
         _db_extract: {
           type: Object,
           value: function() {
             return [[]];
           }
         },
+        // Contains Grid 
         gridBase: {
           type: Object,
           value: function() {
             return [[]];
           }
         },
+        // Selected Items
         gridSelected: {
           type: Object,
           value: function() {
             return [[]];
           },
         },
-        gridItem: {
-          type: Object,
-          value: function() {
-            return [[]];
-          },
-        },
+        // Dialog Component
         dialogCom: {
           type: Object,
           value: function() {
             return [[]];
           },
         },
+        // Data Component
         dataCom: {
           type: Object,
           value: function() {
             return [[]];
           },
         },
+        // Row Storage
         timeKey: {
           type: Object,
           value: function() {
@@ -216,7 +219,10 @@
 
       // Function: Save & Edit
       handleSave(e) {
+        // Arguments to function for conditions (Save OR Edit)
         var args = e.target.getAttribute('data-args').split(',');
+
+        // Default Declarations
         var diff = this.$.diff;
         var grid = this.$.grid;
         var stime = this.startValue;
@@ -242,17 +248,18 @@
           this.EndSeconds = etd;
         }
 
+        // Difference Calculation
         diff.from = this.StartSeconds;
         diff.to = this.EndSeconds;
         diff.minUnit = min.value;
         diff.maxUnit = max.value;
         this.rangeValue = diff.diff;
 
-        // Call to Update
+        // Call to Update Grid
         if(args == "save") {
           this.dataCom.db_Update("save", grid, this.timeKey);
         }
-        // Call to Update
+        // Call to Edit Grid Item
         else if(args == "edit") {
           this.dataCom.db_Update("edit", grid, this.timeKey);
         }
@@ -286,13 +293,13 @@
 
       // Function: Related to Item Selection (Recycled from documentation)
       _activeItemChanged(item) {
-        this.gridItem.selectedItems = item ? [item] : [];
-        return this.gridItem.selectedItems;
+        this.gridBase.selectedItems = item ? [item] : [];
+        return this.gridBase.selectedItems;
       }
 
       // Function: Computed property for Selection
       _computeSelected(selectedItems) {
-        this.gridItem = this.$.grid;
+        this.gridBase = this.$.grid;
         this.gridSelected = selectedItems[0];
         this.gridLength = selectedItems.length;
 
@@ -322,8 +329,7 @@
 
         return selectedItems;
       }
-
-      }
+    }
 
     window.customElements.define(uiloader.is, uiloader);
 

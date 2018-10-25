@@ -50,6 +50,7 @@
     
       ready() {
         super.ready();
+        
         this._db = new PouchDB('times');
 
         var options = {};
@@ -67,8 +68,10 @@
 
       // Function: Pass Update Values / Add to DB
       db_Update(option, grid, timeKey) {
+        // Clone timeKey object
         this.timeKey = timeKey;
 
+        // Save new tracker
         if (option == "save") {
         var newDoc = Object.assign({}, this.timeKey);
         if (!newDoc.hasOwnProperty('_id')) {
@@ -79,6 +82,8 @@
           return newDoc;
         })
         }
+
+        // Edit current tracker
         else if (option == "edit") {
           var newDoc = Object.assign({}, this.timeKey);
           this._db.upsert(grid.selectedItems._id, function(doc) {
