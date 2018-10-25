@@ -30,6 +30,11 @@
 <script src="../../bower_components/pouchdb/dist/pouchdb.min.js"></script>
 <script src="../../bower_components/pouchdb-upsert/dist/pouchdb.upsert.js"></script>
 
+<!-- Elements -->
+<link rel="import" href="../../elements/ui-loader.html">
+<link rel="import" href="../../elements/dialog-element.html">
+<link rel="import" href="../../elements/time-tracker-data.html">
+
 <!-- Iron Ajax -->
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
@@ -53,8 +58,10 @@
     
     </style>
 
+    <time-tracker-data id="row_items"></time-tracker-data>
+
     <!-- Grid Space -->
-    <vaadin-grid id="grid" active-item="{{activeItem}}" items="[[timeKey]]" selected-items="{{selectedItems}}">
+    <vaadin-grid id="grid" active-item="{{activeItem}}" items="[[_db_extract]]" selected-items="{{selectedItems}}">
       <vaadin-grid-column>
         <template class="header">Task</template>
         <template>[[item.task]]</template>
@@ -118,6 +125,12 @@
             return [[]];
           }
         },
+        _db_extract: {
+          type: Object,
+          value: function() {
+            return [[]];
+          }
+        },
         gridSelected: {
           type: Object,
           value: function() {
@@ -158,11 +171,9 @@
       ready() {
         super.ready();
         
-        var grid = this.$.grid;
-        var options = {};
-
-        // Local DB
+        // Set DB
         this._db = new PouchDB('times');
+
         // Stop button disabled upon load to prevent blank submissions
         this.stopBtnEnabled = true;
         // Range is a computed value / Remains hidden
@@ -170,19 +181,26 @@
         // Instructions for activation
         this.statusOutput = "Press 'Start Recording' to begin";
 
-        options.include_docs = true;
+        setTimeout(() => { this.push_Grid(); }, 250); 
 
-        // New row extraction routine
-        this._db.allDocs(options, function(error, response) {
-        // map new array 'rows'
-        grid.items = response.rows.map(function(row) {
-          return row.doc;
-          });
-        })
+
       }
 
+      push_Grid() {
+
+        var grid = this.$.grid;
+
+        this._db_extract = this.$.row_items.row_out;
+
+        grid.items = this._db_extract.map(function(row) {
+        return row.doc;
+        });
+        
+      }
+
+
       // Function: Computed property for Selection
-      _computeSelected(selectedItems){
+      _computeSelected(selectedItems) {
         this.gridItem = this.$.grid;
         this.gridSelected = selectedItems[0];
         this.gridLength = selectedItems.length;
@@ -214,6 +232,7 @@
 
       // Function: Delete
       handleDelete() {
+
         this.dialogCom = this.$.confirm.$;
 
         // Show form for confirmation
@@ -267,6 +286,7 @@
 
       // Function: Clear
       handleClear() {
+      
         this._db.allDocs({include_docs: true}).then(allDocs => {
         return allDocs.rows.map(row => {
           return {_id: row.id, _rev: row.doc._rev, _deleted: true};
