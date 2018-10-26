@@ -56,7 +56,7 @@
     <time-tracker-data id="row_items"></time-tracker-data>
 
     <!-- Grid Space -->
-    <vaadin-grid id="grid" active-item="{{activeItem}}" items="[[_db_extract]]" selected-items="{{selectedItems}}" on-selected-items-changed="handleSelect">
+    <vaadin-grid id="grid" active-item="{{activeItem}}" items="[[_db_extract]]" selected-items="{{selectedItems}}">
       <vaadin-grid-column>
         <template class="header">Task</template>
         <template>[[item.task]]</template>
@@ -221,25 +221,25 @@
       handleSave(e) {
         // Arguments to function for conditions (Save OR Edit)
         var args = e.target.getAttribute('save-args').split(',');
-        // from objects [Destructuring assignment es6 syntax]
-        var [diff, grid, stime, ftime] = [this.$.diff, this.$.grid, this.startValue, this.endValue]
+        // from objects [Destructuring assignment es6 syntax for organization]
+        var [diff, grid, stime, ftime] = [this.$.diff, this.$.grid, this.startValue, this.endValue];
         // Minimum and Max
-        var [min, max] = [0, 10000]
+        var [min, max] = [0, 10000];
 
         // On save / specific changes
         if (args == "save") {
           // Set Current Time Values
           [this.endValue, this.EndSeconds] = [(new Date).toTimeString().slice(0,8), Date.now()];
           // Button Toggle
-          [this.saveBtnEnabled, this.stopBtnEnabled] = [false, true]
+          [this.saveBtnEnabled, this.stopBtnEnabled] = [false, true];
         }
 
         // On edit / specific changes
-        else if(args == "edit") {
+        if(args == "edit") {
           // Split Values to Array
-          var [splitS, splitF] = [stime.split(":"), ftime.split(":")]
+          var [splitS, splitF] = [stime.split(":"), ftime.split(":")];
           // Calculate Seconds
-          var [std, etd] = [(splitS[1] * 1000) + (splitS[0] * 60000), (splitF[1] * 1000) + (splitF[0] * 60000)]
+          var [std, etd] = [(splitS[1] * 1000) + (splitS[0] * 60000), (splitF[1] * 1000) + (splitF[0] * 60000)];
 
           // Set 'Start' and 'End' for Difference Calculation with Time-Diff
           [this.StartSeconds, this.EndSeconds] = [std, etd];
@@ -247,7 +247,7 @@
 
         // Difference Calculation
         [diff.from, diff.to, diff.minUnit, diff.maxUnit] = [this.StartSeconds, this.EndSeconds, min.value, max.value];
-        
+
         // Set Range Value
         this.rangeValue = diff.diff;
 
@@ -274,7 +274,7 @@
         // Starting Time in Standard Format
         [this.StartSeconds, this.startValue] = [Date.now(), (new Date).toTimeString().slice(0,8)];
         // Toggle Buttons
-        [this.saveBtnEnabled, this.stopBtnEnabled] = [true, false]
+        [this.saveBtnEnabled, this.stopBtnEnabled] = [true, false];
 
         // Display Status
         this.statusOutput = "Recording Tracker - Press 'Stop and Save' to stop recording";
